@@ -10,7 +10,17 @@
 	"observability": {
 		"enabled": true
 	},
-	"upload_source_maps": true
+	"upload_source_maps": true,
+	// Base de datos para los contadores de uso diario (rate limit).
+	// El ID no es secreto: sin una sesión de la cuenta de Cloudflare no sirve.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "vigia-uso",
+			"database_id": "46459742-00ed-4de0-bc55-ea5c8f6c2297",
+			"migrations_dir": "migrations"
+		}
+	]
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
