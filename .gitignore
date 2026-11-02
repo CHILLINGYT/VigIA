@@ -1,0 +1,18 @@
+# Dependencias (se reinstalan con npm install)
+node_modules/
+
+# Secretos: NUNCA subir al repo
+.env
+.env.*
+.dev.vars
+
+# Resultados de compilación y empaquetado
+out/
+dist/
+release/
+
+# Archivos internos de wrangler (Cloudflare)
+.wrangler/
+
+# Logs
+*.log
