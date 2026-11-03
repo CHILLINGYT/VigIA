@@ -26,7 +26,11 @@ describe('POST /check-url', () => {
 	it('acepta una URL válida', async () => {
 		const response = await checkUrl({ url: 'https://example.com/hola' });
 		expect(response.status).toBe(200);
-		expect(await response.json()).toEqual({ url: 'https://example.com/hola', fuentes: [] });
+		// En los tests no hay API keys, así que cada fuente responde 'error' sin salir a internet.
+		expect(await response.json()).toEqual({
+			url: 'https://example.com/hola',
+			fuentes: [{ fuente: 'google_safe_browsing', resultado: 'error' }],
+		});
 	});
 
 	it('rechaza sin token, o con token incorrecto', async () => {

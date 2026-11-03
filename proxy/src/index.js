@@ -3,6 +3,7 @@
 // Cualquier ruta que no esté acá devuelve 404: este Worker NO es un proxy abierto.
 
 import { registrarUso } from './limites.js';
+import { consultarSafeBrowsing } from './fuentes/safebrowsing.js';
 
 const LARGO_MAXIMO_URL = 2048;
 const LARGO_MAXIMO_CUERPO = 4096;
@@ -59,9 +60,10 @@ async function checkUrl(request, env) {
 		return error(503, 'servicio no disponible, probá más tarde');
 	}
 
-	// Paso 1.1: todavía no consultamos ninguna fuente. En los próximos pasos se agregan
-	// Safe Browsing, URLhaus y VirusTotal.
-	return Response.json({ url: url.href, fuentes: [] });
+	// 5. Consultamos las fuentes. Devolvemos lo que dice cada una: el veredicto lo calcula la app.
+	// Próximos pasos: se suman URLhaus y VirusTotal a esta lista.
+	const fuentes = await Promise.all([consultarSafeBrowsing(url.href, env.SAFE_BROWSING_KEY)]);
+	return Response.json({ url: url.href, fuentes });
 }
 
 export default {
