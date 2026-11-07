@@ -5,6 +5,10 @@ import { contextBridge, ipcRenderer } from 'electron'
 const api = {
   analizarUrl: (texto) => ipcRenderer.invoke('analizar-url', texto),
 
+  // Abre el diálogo de Windows para elegir un archivo y lo analiza por su hash.
+  // No recibe ninguna ruta: la elige el usuario en el diálogo.
+  analizarArchivo: () => ipcRenderer.invoke('analizar-archivo'),
+
   // Prende o apaga la vigilancia del portapapeles (true / false).
   vigilarPortapapeles: (activo) => ipcRenderer.invoke('portapapeles', activo),
 

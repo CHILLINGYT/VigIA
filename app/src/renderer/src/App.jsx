@@ -6,7 +6,10 @@ const VEREDICTOS = {
   sospechoso: { titulo: 'Sospechoso', consejo: 'Tené cuidado: hay señales raras.' },
   desconocido: {
     titulo: 'Sin información suficiente',
-    consejo: 'No sabemos nada de este link. Si no esperabas recibirlo, no lo abras.'
+    consejo: 'No sabemos nada de este link. Si no esperabas recibirlo, no lo abras.',
+    // Los archivos propios (fotos, documentos) casi nunca están en las bases: es normal.
+    consejoArchivo:
+      'Nadie analizó este archivo antes (es normal en tus documentos personales). Si lo descargaste o te lo mandaron y no lo esperabas, no lo abras.'
   },
   sin_detecciones: {
     titulo: 'No encontramos amenazas conocidas',
@@ -43,12 +46,26 @@ function App() {
     }
   }
 
+  async function analizarArchivo() {
+    setCargando(true)
+    try {
+      const respuesta = await window.vigia.analizarArchivo()
+      if (!respuesta.cancelado) setResultado(respuesta) // si cancela, dejamos lo que había
+    } catch {
+      setResultado({ error: 'Algo falló al analizar el archivo. Probá de nuevo.' })
+    } finally {
+      setCargando(false)
+    }
+  }
+
   const info = resultado && VEREDICTOS[resultado.veredicto]
 
   return (
     <main className="contenedor">
       <h1>VigIA</h1>
-      <p className="subtitulo">Pegá un link y te decimos si encontramos algo peligroso.</p>
+      <p className="subtitulo">
+        Pegá un link o elegí un archivo y te decimos si encontramos algo peligroso.
+      </p>
 
       <label className="interruptor">
         <input type="checkbox" checked={vigilando} onChange={cambiarVigilancia} />
@@ -96,14 +113,25 @@ function App() {
         </div>
       </form>
 
+      <div className="archivo">
+        <button type="button" className="secundario" onClick={analizarArchivo} disabled={cargando}>
+          Analizar un archivo…
+        </button>
+        <span className="nota">
+          Solo calculamos su huella (SHA-256): el archivo no se abre ni se sube.
+        </span>
+      </div>
+
       <section aria-live="polite">
         {resultado?.error && <p className="error">{resultado.error}</p>}
         {info && (
           <article className={`resultado ${resultado.veredicto}`}>
             <h2>{info.titulo}</h2>
-            <p className="consejo">{info.consejo}</p>
-            {/* La URL se muestra como texto, nunca como link clickeable. */}
-            <p className="url">{resultado.url}</p>
+            <p className="consejo">
+              {resultado.nombre && info.consejoArchivo ? info.consejoArchivo : info.consejo}
+            </p>
+            {/* La URL o el nombre se muestran como texto, nunca como link clickeable. */}
+            <p className="url">{resultado.url ?? resultado.nombre}</p>
             <ul>
               {resultado.motivos.map((motivo) => (
                 <li key={motivo}>{motivo}</li>
@@ -117,8 +145,8 @@ function App() {
       </section>
 
       <footer>
-        Fuentes: Google Safe Browsing, URLhaus (abuse.ch) y VirusTotal. VigIA no reemplaza a tu
-        antivirus y puede no conocer amenazas muy nuevas.
+        Fuentes: Google Safe Browsing, URLhaus y MalwareBazaar (abuse.ch) y VirusTotal. VigIA no
+        reemplaza a tu antivirus y puede no conocer amenazas muy nuevas.
       </footer>
     </main>
   )

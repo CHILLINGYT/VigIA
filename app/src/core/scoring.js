@@ -9,7 +9,8 @@
 // Nunca decimos "seguro": como mucho, "no encontramos amenazas conocidas".
 
 // Las fuentes que tienen que responder para poder decir "sin detecciones".
-const FUENTES_ESPERADAS = ['google_safe_browsing', 'urlhaus', 'virustotal']
+export const FUENTES_LINK = ['google_safe_browsing', 'urlhaus', 'virustotal']
+export const FUENTES_ARCHIVO = ['malwarebazaar', 'virustotal']
 
 // Con 3 motores o más que la marcan como maliciosa, VirusTotal cuenta como detección firme.
 // Con 1 o 2 puede ser un falso positivo: queda como "sospechoso".
@@ -24,8 +25,9 @@ const AMENAZAS_GOOGLE = {
 
 // fuentes: lo que devolvió el proxy (o null si no se pudo consultar).
 // senales: lo que encontró el análisis local (dominios parecidos, etc.).
+// esperadas: FUENTES_LINK o FUENTES_ARCHIVO.
 // Devuelve { veredicto, motivos: [texto, ...] }.
-export function calcularVeredicto(fuentes, senales = []) {
+export function calcularVeredicto(fuentes, senales = [], esperadas = FUENTES_LINK) {
   const lista = Array.isArray(fuentes) ? fuentes : []
   const fuente = (nombre) => lista.find((f) => f?.fuente === nombre)
   const peligrosos = []
@@ -43,10 +45,18 @@ export function calcularVeredicto(fuentes, senales = []) {
     peligrosos.push('URLhaus (abuse.ch) tiene registrada esta dirección como fuente de malware.')
   }
 
+  const bazaar = fuente('malwarebazaar')
+  if (bazaar?.resultado === 'detectado') {
+    const familia = bazaar.detalle?.[0]
+    peligrosos.push(
+      `MalwareBazaar (abuse.ch) tiene este archivo registrado como malware${familia ? ` (${familia})` : ''}.`
+    )
+  }
+
   const vt = fuente('virustotal')
   if (vt?.resultado === 'detectado' && vt.motores) {
     const { maliciosos = 0, sospechosos: dudosos = 0, total = 0 } = vt.motores
-    const texto = `En VirusTotal, ${maliciosos + dudosos} de ${total} antivirus la marcan como peligrosa.`
+    const texto = `En VirusTotal, ${maliciosos + dudosos} de ${total} antivirus lo marcan como peligroso.`
     if (maliciosos >= MINIMO_MOTORES_PELIGROSO) peligrosos.push(texto)
     else sospechosos.push(texto)
   }
@@ -58,13 +68,13 @@ export function calcularVeredicto(fuentes, senales = []) {
   if (sospechosos.length > 0) return { veredicto: 'sospechoso', motivos: sospechosos }
 
   // Sin indicios. ¿Respondieron todas las fuentes? Si alguna falló, no la conoce o falta, no alcanza.
-  const respondieronTodas = FUENTES_ESPERADAS.every(
+  const respondieronTodas = esperadas.every(
     (nombre) => fuente(nombre)?.resultado === 'no_detectado'
   )
   if (!respondieronTodas) {
     return {
       veredicto: 'desconocido',
-      motivos: ['No pudimos consultar todas las fuentes o no tienen datos sobre este link.']
+      motivos: ['No pudimos consultar todas las fuentes o no tienen datos sobre esto.']
     }
   }
   return {

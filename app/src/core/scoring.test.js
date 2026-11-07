@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { calcularVeredicto } from './scoring.js'
+import { calcularVeredicto, FUENTES_ARCHIVO } from './scoring.js'
 
 const limpio = () => [
   { fuente: 'google_safe_browsing', resultado: 'no_detectado' },
@@ -88,4 +88,35 @@ test('si falta información, el veredicto es "desconocido" y no "sin_detecciones
   assert.equal(veredicto(limpio().slice(0, 2)), 'desconocido') // falta una fuente
   assert.equal(veredicto(null), 'desconocido') // el proxy no respondió
   assert.equal(veredicto(con('urlhaus', { resultado: 'algo_raro' })), 'desconocido')
+})
+
+test('archivos: MalwareBazaar detecta = peligroso, con la familia de malware', () => {
+  const fuentes = [
+    { fuente: 'malwarebazaar', resultado: 'detectado', detalle: ['AZORult', 'exe'] },
+    {
+      fuente: 'virustotal',
+      resultado: 'detectado',
+      motores: { maliciosos: 60, sospechosos: 0, total: 71 }
+    }
+  ]
+  const r = calcularVeredicto(fuentes, [], FUENTES_ARCHIVO)
+  assert.equal(r.veredicto, 'peligroso')
+  assert.match(r.motivos[0], /MalwareBazaar .* \(AZORult\)/)
+})
+
+test('archivos: las fuentes esperadas son MalwareBazaar y VirusTotal', () => {
+  const limpioArchivo = [
+    { fuente: 'malwarebazaar', resultado: 'no_detectado' },
+    {
+      fuente: 'virustotal',
+      resultado: 'no_detectado',
+      motores: { maliciosos: 0, sospechosos: 0, total: 70 }
+    }
+  ]
+  assert.equal(calcularVeredicto(limpioArchivo, [], FUENTES_ARCHIVO).veredicto, 'sin_detecciones')
+  // Con las fuentes de link, a este resultado le faltarían Safe Browsing y URLhaus.
+  assert.equal(calcularVeredicto(limpioArchivo).veredicto, 'desconocido')
+  // Un archivo que VirusTotal nunca vio: desconocido, no "sin detecciones".
+  const nuevo = [limpioArchivo[0], { fuente: 'virustotal', resultado: 'sin_datos' }]
+  assert.equal(calcularVeredicto(nuevo, [], FUENTES_ARCHIVO).veredicto, 'desconocido')
 })

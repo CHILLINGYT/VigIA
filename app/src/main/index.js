@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { analizarUrl } from './analizarUrl.js'
 import { configurarPortapapeles } from './portapapeles.js'
+import { analizarArchivo } from './analizarArchivo.js'
 
 // Solo aceptamos pedidos IPC que vengan de nuestra propia página (no de otro contenido cargado).
 function remitenteValido(event) {
@@ -70,6 +71,13 @@ app.whenReady().then(() => {
   ipcMain.handle('analizar-url', (event, texto) => {
     if (!remitenteValido(event)) return { error: 'Pedido rechazado.' }
     return analizarUrl(texto) // analizarUrl valida el texto (tipo, largo, http/https)
+  })
+
+  // Sin parámetros a propósito: la ruta la elige el usuario en el diálogo de Windows,
+  // así la interfaz nunca puede pedir que se lea un archivo cualquiera.
+  ipcMain.handle('analizar-archivo', (event) => {
+    if (!remitenteValido(event)) return { error: 'Pedido rechazado.' }
+    return analizarArchivo(BrowserWindow.fromWebContents(event.sender))
   })
 
   ipcMain.handle('portapapeles', async (event, activo) => {
