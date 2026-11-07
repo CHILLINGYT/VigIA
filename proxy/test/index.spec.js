@@ -1,6 +1,6 @@
 import { SELF, env, applyD1Migrations } from 'cloudflare:test';
 import { describe, it, expect, beforeAll } from 'vitest';
-import { checkUrl } from './ayuda.js';
+import { checkUrl, pedir } from './ayuda.js';
 
 beforeAll(() => applyD1Migrations(env.DB, env.TEST_MIGRATIONS));
 
@@ -58,5 +58,30 @@ describe('POST /check-url', () => {
 			const response = await checkUrl({ url });
 			expect(response.status, `url: ${String(url).slice(0, 40)}`).toBeGreaterThanOrEqual(400);
 		}
+	});
+});
+
+describe('POST /check-hash', () => {
+	const checkHash = (cuerpo, opciones) => pedir('/check-hash', cuerpo, opciones);
+
+	it('acepta un SHA-256 válido (en mayúsculas también) y lo devuelve en minúsculas', async () => {
+		const response = await checkHash({ sha256: 'A'.repeat(64) });
+		expect(response.status).toBe(200);
+		expect(await response.json()).toEqual({
+			sha256: 'a'.repeat(64),
+			fuentes: [
+				{ fuente: 'malwarebazaar', resultado: 'error' },
+				{ fuente: 'virustotal', resultado: 'error' },
+			],
+			desde_cache: false,
+		});
+	});
+
+	it('rechaza hashes inválidos, sin token o sin ID', async () => {
+		for (const sha256 of [undefined, 123, '', 'a'.repeat(63), 'g'.repeat(64), 'a'.repeat(65)]) {
+			expect((await checkHash({ sha256 })).status, String(sha256)).toBe(400);
+		}
+		expect((await checkHash({ sha256: 'a'.repeat(64) }, { token: null })).status).toBe(401);
+		expect((await checkHash({ sha256: 'a'.repeat(64) }, { id: null })).status).toBe(400);
 	});
 });

@@ -1,6 +1,6 @@
 // Tests de VirusTotal con la API simulada.
 import { it, expect, vi, afterEach } from 'vitest';
-import { consultarVirusTotal, idDeUrl } from '../src/fuentes/virustotal.js';
+import { consultarVirusTotal, consultarVirusTotalArchivo, idDeUrl } from '../src/fuentes/virustotal.js';
 
 const simularVT = (respuesta) => vi.spyOn(globalThis, 'fetch').mockResolvedValue(respuesta);
 const reporte = (stats) =>
@@ -51,4 +51,17 @@ it('sin API key no llama a VirusTotal; con key la manda en x-apikey', async () =
 	const [endpoint, opciones] = fetch.mock.calls[0];
 	expect(endpoint).toBe('https://www.virustotal.com/api/v3/urls/aHR0cHM6Ly9leGFtcGxlLmNvbS8');
 	expect(opciones.headers['x-apikey']).toBe('key-falsa');
+});
+
+it('archivos: consulta /files/<sha256> y responde igual que para URLs', async () => {
+	const fetch = simularVT(reporte({ malicious: 60, harmless: 0, undetected: 10 }));
+	const hash = 'b'.repeat(64);
+	expect(await consultarVirusTotalArchivo(hash, 'key-falsa')).toEqual({
+		fuente: 'virustotal',
+		resultado: 'detectado',
+		motores: { maliciosos: 60, sospechosos: 0, total: 70 },
+	});
+	expect(fetch.mock.calls[0][0]).toBe(`https://www.virustotal.com/api/v3/files/${hash}`);
+	simularVT(Response.json({ error: { code: 'NotFoundError' } }, { status: 404 }));
+	expect((await consultarVirusTotalArchivo(hash, 'key-falsa')).resultado).toBe('sin_datos');
 });
