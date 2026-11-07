@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { analizarUrl } from './analizarUrl.js'
+import { configurarPortapapeles } from './portapapeles.js'
 
 // Solo aceptamos pedidos IPC que vengan de nuestra propia página (no de otro contenido cargado).
 function remitenteValido(event) {
@@ -69,6 +70,12 @@ app.whenReady().then(() => {
   ipcMain.handle('analizar-url', (event, texto) => {
     if (!remitenteValido(event)) return { error: 'Pedido rechazado.' }
     return analizarUrl(texto) // analizarUrl valida el texto (tipo, largo, http/https)
+  })
+
+  ipcMain.handle('portapapeles', async (event, activo) => {
+    if (!remitenteValido(event) || typeof activo !== 'boolean') return false
+    await configurarPortapapeles(event.sender, activo)
+    return activo
   })
 
   createWindow()

@@ -30,6 +30,41 @@ h1 {
   opacity: 0.8;
 }
 
+.interruptor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.indicador {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--sospechoso);
+}
+
+.copiadas {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+button.secundario {
+  max-width: 100%;
+  background: var(--color-background-mute);
+  border: 1px solid var(--borde);
+  font-weight: 400;
+  text-align: left;
+  word-break: break-all;
+}
+
+.formulario {
+  margin-top: 12px;
+}
+
 .formulario label {
   display: block;
   margin-bottom: 6px;
