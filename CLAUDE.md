@@ -18,7 +18,8 @@
 
 \- Uso NO comercial (demo/proyecto educativo). Las APIs gratuitas que usamos
 
-&#x20; (VirusTotal, Safe Browsing, abuse.ch, OpenPhish) prohíben uso comercial.
+&#x20; (VirusTotal, Safe Browsing, abuse.ch) prohíben uso comercial. OpenPhish se descartó
+&#x20; por sus términos (ver docs/decisiones.md, 2026-11-07).
 
 
 
@@ -54,7 +55,7 @@
 
 \- La detección la hacen motores reales: Microsoft Defender (local), VirusTotal,
 
-&#x20; MalwareBazaar, URLhaus, Google Safe Browsing, el feed de OpenPhish y reglas propias.
+&#x20; MalwareBazaar, URLhaus, Google Safe Browsing y reglas propias.
 
 \- El VEREDICTO lo calcula código determinístico (`scoring`), nunca el LLM.
 
@@ -204,9 +205,9 @@ vigia/
 
 &#x20;  Git inicializado, `docs/bitacora.md` creado.
 
-1\. \*\*Links y portapapeles:\*\* `/check-url` (Safe Browsing + URLhaus + VirusTotal), feed de
+1\. \*\*Links y portapapeles:\*\* `/check-url` (Safe Browsing + URLhaus + VirusTotal),
 
-&#x20;  OpenPhish comparado localmente, detector de dominios parecidos contra marcas argentinas
+&#x20;  detector de dominios parecidos contra marcas argentinas
 
 &#x20;  (Mercado Pago, Mercado Libre, bancos, ARCA/AFIP, ANSES, Correo Argentino, WhatsApp).
 

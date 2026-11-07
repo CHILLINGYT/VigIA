@@ -31,3 +31,10 @@ Cada decisión importante: contexto, opciones consideradas, decisión y consecue
   3. **Desconocido:** sin indicios, pero alguna fuente falló, no conoce el link o no respondió.
   4. **Sin detecciones:** las tres fuentes respondieron y ninguna encontró nada. Nunca decimos "seguro".
 - **Consecuencias:** el umbral de 3 motores es arbitrario (con 1 o 2 suele haber falsos positivos) y hay que revisarlo con casos reales. Un link de phishing recién creado que nadie conoce da "desconocido", no "sin detecciones": eso es intencional. La lista de dominios oficiales de marcas la tiene que verificar el equipo de investigación.
+
+## 2026-11-07: OpenPhish se saca del proyecto
+
+- **Contexto:** el plan original incluía el feed gratuito ("Community") de OpenPhish, comparado en la PC. Antes de programarlo leímos sus términos de uso (openphish.com/terms.html). Prohíben usarlo, sin permiso escrito, para *"detection, [...] product development, automation, customer protection"*, y también *"distribute, display, disclose [...] to any third party"*. Solo permiten uso personal o investigación académica.
+- **Opciones consideradas:** (1) pedirle permiso por escrito a OpenPhish y esperar la respuesta, o (2) sacarlo.
+- **Decisión:** sacarlo. VigIA detecta amenazas y les muestra el resultado a otras personas: eso queda, como mínimo, en una zona gris de esos términos. Lo que aporta (listas de phishing) ya lo cubren Google Safe Browsing y el detector de dominios parecidos.
+- **Consecuencias:** una fuente menos de phishing. Se actualizó `CLAUDE.md`. Aprendizaje: leer los términos de cada fuente **antes** de programar, no solo la documentación técnica.
