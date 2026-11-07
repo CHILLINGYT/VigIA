@@ -5,6 +5,7 @@
 import { registrarUso } from './limites.js';
 import { consultarSafeBrowsing } from './fuentes/safebrowsing.js';
 import { consultarUrlhaus } from './fuentes/urlhaus.js';
+import { consultarVirusTotal } from './fuentes/virustotal.js';
 
 const LARGO_MAXIMO_URL = 2048;
 const LARGO_MAXIMO_CUERPO = 4096;
@@ -62,10 +63,11 @@ async function checkUrl(request, env) {
 	}
 
 	// 5. Consultamos las fuentes. Devolvemos lo que dice cada una: el veredicto lo calcula la app.
-	// Se consultan en paralelo. Próximo paso: se suma VirusTotal a esta lista.
+	// Se consultan en paralelo: el usuario espera lo que tarda la más lenta, no la suma.
 	const fuentes = await Promise.all([
 		consultarSafeBrowsing(url.href, env.SAFE_BROWSING_KEY),
 		consultarUrlhaus(url.href, env.URLHAUS_KEY),
+		consultarVirusTotal(url.href, env.VIRUSTOTAL_KEY),
 	]);
 	return Response.json({ url: url.href, fuentes });
 }

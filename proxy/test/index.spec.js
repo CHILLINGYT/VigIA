@@ -32,6 +32,7 @@ describe('POST /check-url', () => {
 			fuentes: [
 				{ fuente: 'google_safe_browsing', resultado: 'error' },
 				{ fuente: 'urlhaus', resultado: 'error' },
+				{ fuente: 'virustotal', resultado: 'error' },
 			],
 		});
 	});
