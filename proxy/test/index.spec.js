@@ -29,7 +29,10 @@ describe('POST /check-url', () => {
 		// En los tests no hay API keys, así que cada fuente responde 'error' sin salir a internet.
 		expect(await response.json()).toEqual({
 			url: 'https://example.com/hola',
-			fuentes: [{ fuente: 'google_safe_browsing', resultado: 'error' }],
+			fuentes: [
+				{ fuente: 'google_safe_browsing', resultado: 'error' },
+				{ fuente: 'urlhaus', resultado: 'error' },
+			],
 		});
 	});
 
