@@ -20,3 +20,14 @@ Cada decisión importante: contexto, opciones consideradas, decisión y consecue
   3. Escribir un decodificador mínimo propio (unas 30 líneas, sin dependencias).
 - **Decisión:** opción 3. Los números de campo los verificamos con las URLs de prueba oficiales de Google: phishing → `SOCIAL_ENGINEERING`, malware → `MALWARE` + `POTENTIALLY_HARMFUL_APPLICATION`, unwanted → `UNWANTED_SOFTWARE`, example.com → sin amenazas.
 - **Consecuencias:** si la respuesta trae algo inesperado (campos desconocidos, datos cortados, una amenaza sin tipo), el resultado es `error` y nunca "sin detecciones". Si Google cambia el formato, VigIA lo muestra como falla y no deja pasar un link peligroso como limpio. Google ve la URL completa; la alternativa privada (`hashes:search`) queda para más adelante.
+
+## 2026-11-07: Reglas del scoring (cómo se decide el veredicto)
+
+- **Contexto:** el veredicto lo tiene que decidir código predecible, nunca el LLM. Cada fuente devuelve `detectado`, `no_detectado`, `sin_datos` o `error`, y además hay señales locales (dominios parecidos, truco del "@", letras de otro alfabeto).
+- **Opciones consideradas:** un puntaje con pesos (por ejemplo, Google = 50 puntos, VirusTotal = 10 por motor) o reglas fijas en orden.
+- **Decisión:** reglas fijas en orden (`app/src/core/scoring.js`), porque cada una se puede leer en voz alta y testear:
+  1. **Peligroso:** Safe Browsing o URLhaus la detectan, o 3 o más antivirus de VirusTotal la marcan como maliciosa.
+  2. **Sospechoso:** 1 o 2 antivirus de VirusTotal, o alguna señal local.
+  3. **Desconocido:** sin indicios, pero alguna fuente falló, no conoce el link o no respondió.
+  4. **Sin detecciones:** las tres fuentes respondieron y ninguna encontró nada. Nunca decimos "seguro".
+- **Consecuencias:** el umbral de 3 motores es arbitrario (con 1 o 2 suele haber falsos positivos) y hay que revisarlo con casos reales. Un link de phishing recién creado que nadie conoce da "desconocido", no "sin detecciones": eso es intencional. La lista de dominios oficiales de marcas la tiene que verificar el equipo de investigación.
