@@ -34,6 +34,7 @@ describe('POST /check-url', () => {
 				{ fuente: 'urlhaus', resultado: 'error' },
 				{ fuente: 'virustotal', resultado: 'error' },
 			],
+			desde_cache: false,
 		});
 	});
 

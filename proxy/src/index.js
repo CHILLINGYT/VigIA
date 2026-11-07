@@ -3,6 +3,7 @@
 // Cualquier ruta que no esté acá devuelve 404: este Worker NO es un proxy abierto.
 
 import { registrarUso } from './limites.js';
+import { leerCache, guardarCache } from './cache.js';
 import { consultarSafeBrowsing } from './fuentes/safebrowsing.js';
 import { consultarUrlhaus } from './fuentes/urlhaus.js';
 import { consultarVirusTotal } from './fuentes/virustotal.js';
@@ -32,7 +33,7 @@ function validarUrl(texto) {
 	}
 }
 
-async function checkUrl(request, env) {
+async function checkUrl(request, env, ctx) {
 	// 1. ¿El pedido viene de la app? (barrera, no seguridad fuerte: el token se puede extraer de la app)
 	const token = request.headers.get('Authorization')?.replace(/^Bearer /, '');
 	if (!tokenValido(token, env.APP_TOKEN)) return error(401, 'no autorizado');
@@ -62,25 +63,32 @@ async function checkUrl(request, env) {
 		return error(503, 'servicio no disponible, probá más tarde');
 	}
 
-	// 5. Consultamos las fuentes. Devolvemos lo que dice cada una: el veredicto lo calcula la app.
+	// 5. ¿Alguien la consultó hace poco? Devolvemos ese resultado sin gastar cuota de las APIs.
+	const enCache = await leerCache(url.href);
+	if (enCache) return Response.json({ ...enCache, desde_cache: true });
+
+	// 6. Consultamos las fuentes. Devolvemos lo que dice cada una: el veredicto lo calcula la app.
 	// Se consultan en paralelo: el usuario espera lo que tarda la más lenta, no la suma.
 	const fuentes = await Promise.all([
 		consultarSafeBrowsing(url.href, env.SAFE_BROWSING_KEY),
 		consultarUrlhaus(url.href, env.URLHAUS_KEY),
 		consultarVirusTotal(url.href, env.VIRUSTOTAL_KEY),
 	]);
-	return Response.json({ url: url.href, fuentes });
+	const resultado = { url: url.href, fuentes };
+	// waitUntil: guardamos en caché después de responder, sin hacer esperar al usuario.
+	ctx.waitUntil(guardarCache(url.href, resultado));
+	return Response.json({ ...resultado, desde_cache: false });
 }
 
 export default {
-	async fetch(request, env) {
+	async fetch(request, env, ctx) {
 		const { pathname } = new URL(request.url);
 
 		if (request.method === 'GET' && pathname === '/') {
 			return Response.json({ servicio: 'vigia-proxy', estado: 'ok' });
 		}
 		if (request.method === 'POST' && pathname === '/check-url') {
-			return checkUrl(request, env);
+			return checkUrl(request, env, ctx);
 		}
 
 		return error(404, 'no encontrado');
