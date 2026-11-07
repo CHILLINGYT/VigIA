@@ -1,8 +1,10 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 
 // Puente mínimo entre la interfaz y el proceso principal.
-// Solo exponemos funciones específicas (analizarUrl, analizarArchivo, etc.),
-// NUNCA ipcRenderer completo. Por ahora está vacío: se llena en la Fase 1.
-const api = {}
+// Solo exponemos funciones específicas, NUNCA ipcRenderer completo:
+// la interfaz puede pedir "analizá este link" y nada más.
+const api = {
+  analizarUrl: (texto) => ipcRenderer.invoke('analizar-url', texto)
+}
 
 contextBridge.exposeInMainWorld('vigia', api)
