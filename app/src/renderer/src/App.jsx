@@ -27,6 +27,12 @@ function App() {
   // Escuchamos los links copiados. Solo llegan si la vigilancia está activada.
   useEffect(() => window.vigia.alCopiarUrl(setCopiadas), [])
 
+  // Al abrir la app: ¿Defender está funcionando? Si no, mostramos el aviso.
+  const [defender, setDefender] = useState(null)
+  useEffect(() => {
+    window.vigia.estadoDefender().then(setDefender)
+  }, [])
+
   async function cambiarVigilancia(evento) {
     setVigilando(await window.vigia.vigilarPortapapeles(evento.target.checked))
     setCopiadas([])
@@ -63,6 +69,11 @@ function App() {
   return (
     <main className="contenedor">
       <h1>VigIA</h1>
+      {defender?.aviso && (
+        <p className="aviso-defender" role="alert">
+          {defender.aviso}
+        </p>
+      )}
       <p className="subtitulo">
         Pegá un link o elegí un archivo y te decimos si encontramos algo peligroso.
       </p>

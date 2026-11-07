@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { analizarUrl } from './analizarUrl.js'
 import { configurarPortapapeles } from './portapapeles.js'
 import { analizarArchivo } from './analizarArchivo.js'
+import { estadoDefender } from './defender.js'
 
 // Solo aceptamos pedidos IPC que vengan de nuestra propia página (no de otro contenido cargado).
 function remitenteValido(event) {
@@ -80,12 +81,18 @@ app.whenReady().then(() => {
     return analizarArchivo(BrowserWindow.fromWebContents(event.sender))
   })
 
+  ipcMain.handle('estado-defender', (event) => {
+    if (!remitenteValido(event)) return null
+    return estadoDefender()
+  })
+
   ipcMain.handle('portapapeles', async (event, activo) => {
     if (!remitenteValido(event) || typeof activo !== 'boolean') return false
     await configurarPortapapeles(event.sender, activo)
     return activo
   })
 
+  estadoDefender() // empezamos a leerlo al iniciar, mientras se abre la ventana
   createWindow()
 
   app.on('activate', function () {

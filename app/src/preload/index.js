@@ -9,6 +9,9 @@ const api = {
   // No recibe ninguna ruta: la elige el usuario en el diálogo.
   analizarArchivo: () => ipcRenderer.invoke('analizar-archivo'),
 
+  // Estado de Microsoft Defender: { estado, puedeEscanear, aviso }.
+  estadoDefender: () => ipcRenderer.invoke('estado-defender'),
+
   // Prende o apaga la vigilancia del portapapeles (true / false).
   vigilarPortapapeles: (activo) => ipcRenderer.invoke('portapapeles', activo),
 
