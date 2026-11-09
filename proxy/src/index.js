@@ -8,9 +8,12 @@ import { consultarSafeBrowsing } from './fuentes/safebrowsing.js';
 import { consultarUrlhaus } from './fuentes/urlhaus.js';
 import { consultarVirusTotal, consultarVirusTotalArchivo } from './fuentes/virustotal.js';
 import { consultarMalwareBazaar } from './fuentes/malwarebazaar.js';
+import { completar } from './llm.js';
+import { armarMensajes } from './prompt.js';
 
 const LARGO_MAXIMO_URL = 2048;
 const LARGO_MAXIMO_CUERPO = 4096;
+const LARGO_MAXIMO_CUERPO_CHAT = 32768; // el chat lleva el historial de la conversación
 const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const FORMATO_SHA256 = /^[0-9a-f]{64}$/i;
 
@@ -37,7 +40,7 @@ function validarUrl(texto) {
 
 // Controles 1 a 3, iguales para todos los endpoints.
 // Devuelve { idInstalacion, datos } o { rechazo: Response } si algo no está bien.
-async function leerPedido(request, env) {
+async function leerPedido(request, env, largoMaximo = LARGO_MAXIMO_CUERPO) {
 	// 1. ¿El pedido viene de la app? (barrera, no seguridad fuerte: el token se puede extraer de la app)
 	const token = request.headers.get('Authorization')?.replace(/^Bearer /, '');
 	if (!tokenValido(token, env.APP_TOKEN)) return { rechazo: error(401, 'no autorizado') };
@@ -48,7 +51,7 @@ async function leerPedido(request, env) {
 
 	// 3. ¿El cuerpo es JSON chico?
 	const cuerpo = await request.text();
-	if (cuerpo.length > LARGO_MAXIMO_CUERPO) return { rechazo: error(413, 'pedido demasiado grande') };
+	if (cuerpo.length > largoMaximo) return { rechazo: error(413, 'pedido demasiado grande') };
 	try {
 		return { idInstalacion, datos: JSON.parse(cuerpo) };
 	} catch {
@@ -58,9 +61,10 @@ async function leerPedido(request, env) {
 
 // Control 4: ¿le queda cuota hoy? Devuelve null si puede seguir, o la respuesta de rechazo.
 // Si la base falla, rechazamos: preferimos no responder a gastar cuotas.
-async function descontarCuota(env, idInstalacion) {
+// tipo: 'consulta' (links y archivos) o 'chat'.
+async function descontarCuota(env, idInstalacion, tipo = 'consulta') {
 	try {
-		return (await registrarUso(env.DB, idInstalacion, 'consulta')) ? null : error(429, 'llegaste al límite de consultas de hoy');
+		return (await registrarUso(env.DB, idInstalacion, tipo)) ? null : error(429, 'llegaste al límite de hoy');
 	} catch {
 		return error(503, 'servicio no disponible, probá más tarde');
 	}
@@ -113,6 +117,54 @@ async function checkHash(request, env, ctx) {
 	);
 }
 
+// --- Chat ---
+const MAXIMO_MENSAJES = 20;
+const LARGO_MAXIMO_MENSAJE = 4000;
+const MAXIMO_ANALISIS = 5;
+const VEREDICTOS = ['peligroso', 'sospechoso', 'desconocido', 'sin_detecciones'];
+
+const esTexto = (valor, maximo) => typeof valor === 'string' && valor.length > 0 && valor.length <= maximo;
+
+// Valida el cuerpo de /chat. Devuelve { historial, analisis } o null si algo no cumple.
+// Todo llega de afuera: tipos, cantidades y largos se revisan uno por uno.
+function validarChat(datos) {
+	const { historial, analisis = [] } = datos ?? {};
+	if (!Array.isArray(historial) || historial.length === 0 || historial.length > MAXIMO_MENSAJES) return null;
+	const historialOk = historial.every(
+		(m) => (m?.rol === 'usuario' || m?.rol === 'asistente') && esTexto(m.texto, LARGO_MAXIMO_MENSAJE),
+	);
+	if (!historialOk || historial.at(-1).rol !== 'usuario') return null;
+
+	if (!Array.isArray(analisis) || analisis.length > MAXIMO_ANALISIS) return null;
+	const analisisOk = analisis.every(
+		(a) =>
+			(a?.tipo === 'link' || a?.tipo === 'archivo') &&
+			esTexto(a.objetivo, LARGO_MAXIMO_URL) &&
+			VEREDICTOS.includes(a.veredicto) &&
+			Array.isArray(a.motivos) &&
+			a.motivos.length <= 10 &&
+			a.motivos.every((m) => esTexto(m, 500)),
+	);
+	return analisisOk ? { historial, analisis } : null;
+}
+
+async function chat(request, env) {
+	const pedido = await leerPedido(request, env, LARGO_MAXIMO_CUERPO_CHAT);
+	if (pedido.rechazo) return pedido.rechazo;
+	const valido = validarChat(pedido.datos);
+	if (!valido) return error(400, 'conversación inválida');
+	const sinCuota = await descontarCuota(env, pedido.idInstalacion, 'chat');
+	if (sinCuota) return sinCuota;
+
+	try {
+		const respuesta = await completar(armarMensajes(valido.historial, valido.analisis), env);
+		return Response.json({ respuesta });
+	} catch (e) {
+		console.error('chat:', e.message); // nunca el contenido de la conversación
+		return error(502, 'la IA no respondió');
+	}
+}
+
 export default {
 	async fetch(request, env, ctx) {
 		const { pathname } = new URL(request.url);
@@ -122,6 +174,9 @@ export default {
 		}
 		if (request.method === 'POST' && pathname === '/check-url') {
 			return checkUrl(request, env, ctx);
+		}
+		if (request.method === 'POST' && pathname === '/chat') {
+			return chat(request, env);
 		}
 		if (request.method === 'POST' && pathname === '/check-hash') {
 			return checkHash(request, env, ctx);

@@ -3,6 +3,7 @@
 
 const LIMITES = {
 	consulta: { porInstalacion: 50, global: 400 }, // VirusTotal gratis permite 500 por día
+	chat: { porInstalacion: 30, global: 900 }, // Groq (gpt-oss-20b) permite 1000 pedidos por día
 };
 
 const SQL_SUMAR_UNO = `
