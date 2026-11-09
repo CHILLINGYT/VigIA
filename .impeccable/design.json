@@ -1,0 +1,579 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-08T23:46:54.186Z",
+  "title": "Design System: VigIA",
+  "extensions": {
+    "colorMeta": {
+      "tinta": {
+        "role": "primary",
+        "displayName": "Azul tinta",
+        "canonical": "#0e2a47",
+        "tonalRamp": [
+          "#040b12",
+          "#061320",
+          "#091b2e",
+          "#0c243c",
+          "#0e2a47",
+          "#566a7e",
+          "#939fac",
+          "#dbdfe3"
+        ]
+      },
+      "tinta-hover": {
+        "role": "primary",
+        "displayName": "Tinta hover",
+        "canonical": "#17406a",
+        "tonalRamp": [
+          "#06101b",
+          "#0a1d30",
+          "#0f2a45",
+          "#14365a",
+          "#17406a",
+          "#5d7997",
+          "#97a9bc",
+          "#dce2e9"
+        ]
+      },
+      "fondo": {
+        "role": "neutral",
+        "displayName": "Fondo celeste muy claro",
+        "canonical": "#eef4f8",
+        "tonalRamp": [
+          "#3c3d3e",
+          "#6b6e70",
+          "#9b9fa1",
+          "#cacfd3",
+          "#eef4f8",
+          "#f3f7fa",
+          "#f7fafc",
+          "#fcfdfe"
+        ]
+      },
+      "papel": {
+        "role": "neutral",
+        "displayName": "Papel",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#404040",
+          "#737373",
+          "#a6a6a6",
+          "#d9d9d9",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "linea": {
+        "role": "neutral",
+        "displayName": "Línea",
+        "canonical": "#d3e2ec",
+        "tonalRamp": [
+          "#35393b",
+          "#5f666a",
+          "#899399",
+          "#b3c0c9",
+          "#d3e2ec",
+          "#e0ebf2",
+          "#ebf2f6",
+          "#f8fbfc"
+        ]
+      },
+      "linea-fuerte": {
+        "role": "neutral",
+        "displayName": "Línea fuerte",
+        "canonical": "#b7cfdf",
+        "tonalRamp": [
+          "#2e3438",
+          "#525d64",
+          "#778791",
+          "#9cb0be",
+          "#b7cfdf",
+          "#cddde9",
+          "#dfe9f1",
+          "#f4f8fa"
+        ]
+      },
+      "texto": {
+        "role": "neutral",
+        "displayName": "Texto",
+        "canonical": "#12263b",
+        "tonalRamp": [
+          "#050a0f",
+          "#08111b",
+          "#0c1926",
+          "#0f2032",
+          "#12263b",
+          "#596776",
+          "#949da7",
+          "#dbdee2"
+        ]
+      },
+      "texto-2": {
+        "role": "neutral",
+        "displayName": "Texto secundario",
+        "canonical": "#4a6278",
+        "tonalRamp": [
+          "#13191e",
+          "#212c36",
+          "#30404e",
+          "#3f5366",
+          "#4a6278",
+          "#8091a1",
+          "#aeb8c2",
+          "#e4e7eb"
+        ]
+      },
+      "texto-en-tinta": {
+        "role": "neutral",
+        "displayName": "Texto sobre tinta",
+        "canonical": "#d6e7f2",
+        "tonalRamp": [
+          "#363a3d",
+          "#60686d",
+          "#8b969d",
+          "#b6c4ce",
+          "#d6e7f2",
+          "#e2eef6",
+          "#edf4f9",
+          "#f9fbfd"
+        ]
+      },
+      "texto-en-tinta-2": {
+        "role": "neutral",
+        "displayName": "Texto sobre tinta secundario",
+        "canonical": "#9bbbd3",
+        "tonalRamp": [
+          "#272f35",
+          "#46545f",
+          "#657a89",
+          "#849fb3",
+          "#9bbbd3",
+          "#b9cfe0",
+          "#d2e0eb",
+          "#f0f5f8"
+        ]
+      },
+      "celeste": {
+        "role": "secondary",
+        "displayName": "Celeste institucional",
+        "canonical": "#7fb8da",
+        "tonalRamp": [
+          "#202e37",
+          "#395362",
+          "#53788e",
+          "#6c9cb9",
+          "#7fb8da",
+          "#a5cde5",
+          "#c5dfee",
+          "#ecf4f9"
+        ]
+      },
+      "celeste-claro": {
+        "role": "secondary",
+        "displayName": "Celeste claro",
+        "canonical": "#cfe6f3",
+        "tonalRamp": [
+          "#343a3d",
+          "#5d686d",
+          "#87969e",
+          "#b0c4cf",
+          "#cfe6f3",
+          "#ddeef7",
+          "#e9f4fa",
+          "#f8fbfd"
+        ]
+      },
+      "celeste-velo": {
+        "role": "secondary",
+        "displayName": "Velo celeste",
+        "canonical": "#e2eff7",
+        "tonalRamp": [
+          "#393c3e",
+          "#666c6f",
+          "#939ba1",
+          "#c0cbd2",
+          "#e2eff7",
+          "#ebf4f9",
+          "#f2f8fb",
+          "#fbfdfe"
+        ]
+      },
+      "accion": {
+        "role": "primary",
+        "displayName": "Azul acción",
+        "canonical": "#1f6fa8",
+        "tonalRamp": [
+          "#081c2a",
+          "#0e324c",
+          "#14486d",
+          "#1a5e8f",
+          "#1f6fa8",
+          "#629ac2",
+          "#9abed8",
+          "#dde9f2"
+        ]
+      },
+      "accion-hover": {
+        "role": "primary",
+        "displayName": "Azul acción hover",
+        "canonical": "#185a8a",
+        "tonalRamp": [
+          "#061723",
+          "#0b293e",
+          "#103b5a",
+          "#144d75",
+          "#185a8a",
+          "#5d8cad",
+          "#97b5ca",
+          "#dce6ed"
+        ]
+      },
+      "peligroso": {
+        "role": "tertiary",
+        "displayName": "Rojo peligroso",
+        "canonical": "#b42318",
+        "tonalRamp": [
+          "#2d0906",
+          "#51100b",
+          "#751710",
+          "#991e14",
+          "#b42318",
+          "#cb655d",
+          "#dd9c97",
+          "#f4dedc"
+        ]
+      },
+      "sospechoso": {
+        "role": "tertiary",
+        "displayName": "Naranja sospechoso",
+        "canonical": "#a5480a",
+        "tonalRamp": [
+          "#291203",
+          "#4a2005",
+          "#6b2f07",
+          "#8c3d09",
+          "#a5480a",
+          "#c07f54",
+          "#d7ad91",
+          "#f2e4da"
+        ]
+      },
+      "desconocido": {
+        "role": "tertiary",
+        "displayName": "Gris desconocido",
+        "canonical": "#5b6b7a",
+        "tonalRamp": [
+          "#171b1f",
+          "#293037",
+          "#3b464f",
+          "#4d5b68",
+          "#5b6b7a",
+          "#8c97a2",
+          "#b5bcc3",
+          "#e6e9eb"
+        ]
+      },
+      "sin-detecciones": {
+        "role": "tertiary",
+        "displayName": "Verde sin detecciones",
+        "canonical": "#15803d",
+        "tonalRamp": [
+          "#05200f",
+          "#093a1b",
+          "#0e5328",
+          "#126d34",
+          "#15803d",
+          "#5ba677",
+          "#96c6a8",
+          "#dcece2"
+        ]
+      },
+      "f-google": {
+        "role": "tertiary",
+        "displayName": "Tinta Google Safe Browsing",
+        "canonical": "#6b3fa0",
+        "tonalRamp": [
+          "#1b1028",
+          "#301c48",
+          "#462968",
+          "#5b3688",
+          "#6b3fa0",
+          "#9779bd",
+          "#bca9d4",
+          "#e9e2f1"
+        ]
+      },
+      "f-urlhaus": {
+        "role": "tertiary",
+        "displayName": "Tinta URLhaus",
+        "canonical": "#c2611f",
+        "tonalRamp": [
+          "#311808",
+          "#572c0e",
+          "#7e3f14",
+          "#a5521a",
+          "#c2611f",
+          "#d49062",
+          "#e4b89a",
+          "#f6e7dd"
+        ]
+      },
+      "f-bazaar": {
+        "role": "tertiary",
+        "displayName": "Tinta MalwareBazaar",
+        "canonical": "#a23b5a",
+        "tonalRamp": [
+          "#290f17",
+          "#491b29",
+          "#69263b",
+          "#8a324d",
+          "#a23b5a",
+          "#be768c",
+          "#d5a7b5",
+          "#f1e2e6"
+        ]
+      },
+      "f-vt": {
+        "role": "tertiary",
+        "displayName": "Tinta VirusTotal",
+        "canonical": "#1f6fa8",
+        "tonalRamp": [
+          "#081c2a",
+          "#0e324c",
+          "#14486d",
+          "#1a5e8f",
+          "#1f6fa8",
+          "#629ac2",
+          "#9abed8",
+          "#dde9f2"
+        ]
+      },
+      "f-reglas": {
+        "role": "tertiary",
+        "displayName": "Tinta Reglas de VigIA",
+        "canonical": "#2f7d5b",
+        "tonalRamp": [
+          "#0c1f17",
+          "#153829",
+          "#1f513b",
+          "#286a4d",
+          "#2f7d5b",
+          "#6da48c",
+          "#a1c5b5",
+          "#e0ece6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Saludo de la pantalla vacía."
+      },
+      "marca": {
+        "displayName": "Marca",
+        "purpose": "Nombre VigIA en la barra lateral."
+      },
+      "veredicto": {
+        "displayName": "Veredicto",
+        "purpose": "Palabra del sello, en el color del veredicto."
+      },
+      "veredicto-peligroso": {
+        "displayName": "Veredicto peligroso",
+        "purpose": "Escala mayor por gravedad."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Conversación y explicación de la IA, máximo 68ch."
+      },
+      "body-sm": {
+        "displayName": "Body chico",
+        "purpose": "Motivos del sello, sugerencias."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Títulos de sección de la barra lateral, sin mayúsculas forzadas."
+      },
+      "maquina": {
+        "displayName": "Máquina",
+        "purpose": "Línea LINK / ARCHIVO / SHA-256 y folio de emisión."
+      },
+      "maquina-rotulo": {
+        "displayName": "Rótulo de máquina",
+        "purpose": "LINK, ARCHIVO, SHA-256."
+      },
+      "microtexto": {
+        "displayName": "Microtexto",
+        "purpose": "Línea de letras diminutas del sello; oculta a lectores de pantalla."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sombra-sello",
+        "value": "0 1px 2px rgb(14 42 71 / 0.06), 0 8px 24px -8px rgb(14 42 71 / 0.18)",
+        "purpose": "Exclusiva del sello de veredicto: la única elevación."
+      },
+      {
+        "name": "foco-caja",
+        "value": "0 0 0 3px rgb(31 111 168 / 0.15)",
+        "purpose": "Anillo de foco de la caja de mensaje; no es elevación."
+      }
+    ],
+    "motion": [
+      {
+        "name": "curva",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Curva única para transiciones (160ms) y animaciones."
+      },
+      {
+        "name": "entrar",
+        "value": "360ms, translateY(6px) + opacidad",
+        "purpose": "Entrada de cada mensaje."
+      },
+      {
+        "name": "dibujar",
+        "value": "900ms, 140ms de retraso por anillo",
+        "purpose": "Anillos de la roseta en cascada, de afuera hacia adentro."
+      },
+      {
+        "name": "girar",
+        "value": "6s linear infinite",
+        "purpose": "Roseta en espera."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sugerencias-una-columna",
+        "value": "1100px"
+      },
+      {
+        "name": "lateral-angosta",
+        "value": "900px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón enviar",
+      "kind": "button",
+      "refersTo": "boton-enviar",
+      "description": "Acción principal de la caja de mensaje.",
+      "html": "<button class=\"ds-enviar\" aria-label=\"Enviar\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 19V5M5 12l7-7 7 7\"/></svg></button>",
+      "css": ".ds-enviar{display:grid;place-items:center;width:36px;height:36px;border:none;border-radius:10px;background:var(--accion,#1f6fa8);color:#fff;cursor:pointer;transition:background 160ms cubic-bezier(0.16,1,0.3,1)}.ds-enviar:hover{background:var(--accion-hover,#185a8a)}.ds-enviar:focus-visible{outline:2px solid var(--accion,#1f6fa8);outline-offset:2px}.ds-enviar:disabled{background:var(--linea,#d3e2ec);color:#8aa0b3}"
+    },
+    {
+      "name": "Botón chico",
+      "kind": "button",
+      "refersTo": "boton-chico",
+      "description": "Acción puntual dentro de un aviso (Analizar el link copiado).",
+      "html": "<button class=\"ds-chico\">Analizar</button>",
+      "css": ".ds-chico{padding:5px 10px;border:none;border-radius:8px;background:var(--accion,#1f6fa8);color:#fff;font:600 13px \"Segoe UI Variable Text\",\"Segoe UI\",system-ui,sans-serif;cursor:pointer}.ds-chico:hover{background:var(--accion-hover,#185a8a)}.ds-chico:focus-visible{outline:2px solid var(--accion,#1f6fa8);outline-offset:2px}"
+    },
+    {
+      "name": "Sugerencia",
+      "kind": "card",
+      "refersTo": "sugerencia",
+      "description": "Tarjeta de ejemplo en la pantalla vacía.",
+      "html": "<button class=\"ds-sug\"><strong>Revisar un link</strong><span>Pegá un link que te llegó por WhatsApp.</span></button>",
+      "css": ".ds-sug{display:block;text-align:left;padding:12px 14px;border:1px solid var(--linea,#d3e2ec);border-radius:10px;background:var(--papel,#fff);font:14px/1.4 \"Segoe UI Variable Text\",\"Segoe UI\",system-ui,sans-serif;cursor:pointer;transition:border-color 160ms cubic-bezier(0.16,1,0.3,1),background 160ms cubic-bezier(0.16,1,0.3,1)}.ds-sug strong{display:block;font-weight:600;color:var(--tinta,#0e2a47)}.ds-sug span{color:var(--texto-2,#4a6278)}.ds-sug:hover{border-color:var(--celeste,#7fb8da);background:var(--celeste-velo,#e2eff7)}.ds-sug:focus-visible{outline:2px solid var(--accion,#1f6fa8);outline-offset:2px}"
+    },
+    {
+      "name": "Caja de mensaje",
+      "kind": "input",
+      "refersTo": "caja",
+      "description": "Composer con adjuntar y enviar.",
+      "html": "<div class=\"ds-caja\"><textarea placeholder=\"Pegá un link o escribí tu pregunta…\"></textarea></div>",
+      "css": ".ds-caja{border:1px solid var(--linea-fuerte,#b7cfdf);border-radius:16px;background:var(--papel,#fff);transition:border-color 160ms cubic-bezier(0.16,1,0.3,1),box-shadow 160ms cubic-bezier(0.16,1,0.3,1)}.ds-caja:focus-within{border-color:var(--accion,#1f6fa8);box-shadow:0 0 0 3px rgb(31 111 168 / 0.15)}.ds-caja textarea{display:block;width:100%;min-height:52px;padding:14px 16px 6px;border:none;outline:none;resize:none;background:transparent;font:15px/1.55 \"Segoe UI Variable Text\",\"Segoe UI\",system-ui,sans-serif;color:var(--texto,#12263b)}.ds-caja textarea::placeholder{color:var(--texto-2,#4a6278)}"
+    },
+    {
+      "name": "Adjunto",
+      "kind": "chip",
+      "refersTo": "adjunto",
+      "description": "Archivo adjuntado antes de enviar.",
+      "html": "<span class=\"ds-adj\"><span>factura.pdf</span><button aria-label=\"Quitar\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6 6 18\"/></svg></button></span>",
+      "css": ".ds-adj{display:inline-flex;align-items:center;gap:6px;padding:4px 4px 4px 9px;border:1px solid var(--linea,#d3e2ec);border-radius:8px;background:var(--fondo,#eef4f8);font:13px \"Segoe UI Variable Text\",\"Segoe UI\",system-ui,sans-serif;color:var(--tinta,#0e2a47)}.ds-adj button{display:grid;place-items:center;width:22px;height:22px;border:none;border-radius:6px;background:none;color:var(--texto-2,#4a6278);cursor:pointer}.ds-adj button:hover{background:var(--linea,#d3e2ec);color:var(--tinta,#0e2a47)}.ds-adj button:focus-visible{outline:2px solid var(--accion,#1f6fa8);outline-offset:2px}"
+    },
+    {
+      "name": "Burbuja de la persona",
+      "kind": "custom",
+      "refersTo": "burbuja-persona",
+      "description": "Mensaje de la persona, alineado a la derecha.",
+      "html": "<p class=\"ds-yo\">Me llegó este link por WhatsApp, ¿lo abro?</p>",
+      "css": ".ds-yo{display:inline-block;margin:0;padding:10px 14px;border-radius:14px 14px 4px 14px;background:var(--celeste-claro,#cfe6f3);color:var(--tinta,#0e2a47);font:15px/1.55 \"Segoe UI Variable Text\",\"Segoe UI\",system-ui,sans-serif}"
+    },
+    {
+      "name": "Barra lateral",
+      "kind": "nav",
+      "refersTo": "lateral",
+      "description": "Marco en tinta: marca, nueva conversación, estado y fuentes.",
+      "html": "<aside class=\"ds-lat\"><span class=\"ds-lat-marca\">Vig<span>IA</span></span><button class=\"ds-lat-nueva\">Nueva conversación</button><h2>Quiénes revisan</h2><p class=\"ds-lat-f\"><svg width=\"18\" height=\"10\" viewBox=\"0 0 18 10\" fill=\"none\" stroke=\"#6b3fa0\" stroke-width=\"1.75\" stroke-linecap=\"round\"><path d=\"M1 5c2-4 4-4 6 0s4 4 6 0 3-3 4-1\"/></svg>Google Safe Browsing</p></aside>",
+      "css": ".ds-lat{display:flex;flex-direction:column;gap:14px;width:264px;padding:20px 16px;background:var(--tinta,#0e2a47);color:var(--texto-en-tinta,#d6e7f2);font:13px \"Segoe UI Variable Text\",\"Segoe UI\",system-ui,sans-serif}.ds-lat-marca{font:600 30px/1 \"Bodoni Moda\",\"Bodoni MT\",serif;color:#fff}.ds-lat-marca span{color:var(--celeste,#7fb8da)}.ds-lat-nueva{text-align:left;padding:9px 12px;border:1px solid rgb(127 184 218 / 0.35);border-radius:10px;background:none;color:#fff;font:inherit;cursor:pointer;transition:background 160ms cubic-bezier(0.16,1,0.3,1)}.ds-lat-nueva:hover{background:var(--tinta-hover,#17406a)}.ds-lat-nueva:focus-visible{outline:2px solid var(--accion,#1f6fa8);outline-offset:2px}.ds-lat h2{margin:0;font-size:12px;font-weight:600;color:var(--texto-en-tinta-2,#9bbbd3)}.ds-lat-f{display:flex;gap:8px;align-items:center;margin:0}"
+    },
+    {
+      "name": "Sello de veredicto",
+      "kind": "custom",
+      "refersTo": "sello",
+      "description": "La única superficie elevada: el veredicto del scoring, aparte del texto de la IA.",
+      "html": "<article class=\"ds-sello\"><svg width=\"112\" height=\"112\" viewBox=\"0 0 120 120\" role=\"img\" aria-label=\"Roseta\"><circle cx=\"60\" cy=\"60\" r=\"54\" fill=\"none\" stroke=\"#6b3fa0\" stroke-width=\"0.75\"/><circle cx=\"60\" cy=\"60\" r=\"45.5\" fill=\"none\" stroke=\"#c2611f\" stroke-width=\"0.75\" opacity=\"0.5\"/><circle cx=\"60\" cy=\"60\" r=\"37\" fill=\"none\" stroke=\"#1f6fa8\" stroke-width=\"0.75\"/><circle cx=\"60\" cy=\"60\" r=\"15\" fill=\"#b42318\"/><path d=\"M53 53l14 14M67 53 53 67\" stroke=\"#fff\" stroke-width=\"2.6\" stroke-linecap=\"round\"/></svg><div><div class=\"ds-sello-enc\"><h3>Peligroso</h3><span>Emitido 20:42</span></div><p class=\"ds-sello-consejo\">No lo abras ni ingreses datos.</p><p class=\"ds-sello-maq\"><b>LINK</b><span>https://ejemplo.test/s/phishing.html</span></p></div></article>",
+      "css": ".ds-sello{display:grid;grid-template-columns:auto 1fr;gap:18px;padding:18px 20px;background:var(--papel,#fff);border:1px solid var(--linea,#d3e2ec);border-radius:14px;box-shadow:0 1px 2px rgb(14 42 71 / 0.06),0 8px 24px -8px rgb(14 42 71 / 0.18);font:15px/1.55 \"Segoe UI Variable Text\",\"Segoe UI\",system-ui,sans-serif;color:var(--texto,#12263b)}.ds-sello-enc{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.ds-sello h3{margin:0;font:600 34px/1.1 \"Bodoni Moda\",\"Bodoni MT\",serif;color:var(--peligroso,#b42318)}.ds-sello-enc span{font:11.5px \"Cascadia Mono\",Consolas,monospace;color:var(--texto-2,#4a6278)}.ds-sello-consejo{margin:6px 0;font-weight:600}.ds-sello-maq{display:flex;gap:10px;margin:0;font:12.5px \"Cascadia Mono\",Consolas,monospace;color:var(--texto-2,#4a6278)}.ds-sello-maq b{font-weight:600;letter-spacing:0.08em;color:var(--tinta,#0e2a47)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Impresión de seguridad",
+    "overview": "VigIA toma su mundo del DNI y los billetes argentinos: azul tinta, celeste institucional, papel blanco, guilloché, microtexto y la línea de lectura mecánica en monoespaciada. La idea es que cada respuesta se lea como un documento verificado: el veredicto lo emite un sello, y la explicación de la IA va abajo, aparte, como texto común.\n\nEl tema es claro a propósito: la persona usa VigIA de día, en su casa, en el momento de la duda, con el link o el archivo recién recibido. Fondo celeste muy claro, texto en tinta, una barra lateral azul tinta que da el marco institucional. La densidad es baja y tranquila; lo único que llama la atención es el sello.\n\nLo que se rechaza: el chat genérico donde el veredicto es una frase más de la IA, y cualquier aviso que transmita certeza (\"seguro\", \"100%\").",
+    "keyCharacteristics": [
+      "Tema claro, papel y tinta; la tinta azul (#0e2a47) enmarca, el celeste acompaña.",
+      "El sello de veredicto es la única superficie elevada y siempre está separado del texto de la IA.",
+      "Guilloché solo en el sello (roseta) y en el logo.",
+      "Una tinta fija por fuente de análisis, la misma en la roseta y en la barra lateral.",
+      "Datos de máquina (link, hash, hora de emisión) en monoespaciada.",
+      "Veredictos que se entienden sin color: palabra + símbolo central."
+    ],
+    "rules": [
+      {
+        "name": "La regla de una tinta por fuente",
+        "body": "Cada fuente tiene un color fijo, como los billetes. Ese color no se reutiliza para otra cosa ni cambia de una pantalla a otra.",
+        "section": "colors"
+      },
+      {
+        "name": "La regla del veredicto sin color",
+        "body": "El veredicto nunca se transmite solo por color: siempre lleva su palabra (\"Peligroso\", \"Sospechoso\", \"Sin información suficiente\", \"No encontramos amenazas conocidas\") y su símbolo en el centro de la roseta (cruz, signo de exclamación, signo de pregunta, tilde).",
+        "section": "colors"
+      },
+      {
+        "name": "La regla de nunca \"seguro\"",
+        "body": "Ningún texto, color ni símbolo dice \"seguro\". El verde (sin-detecciones) acompaña a \"No encontramos amenazas conocidas\" y a un consejo que aclara que eso no lo garantiza.",
+        "section": "colors"
+      },
+      {
+        "name": "La regla de la letra grabada",
+        "body": "Bodoni se reserva para la marca, el saludo y la palabra del veredicto. No va en botones, cuerpo ni etiquetas.",
+        "section": "typography"
+      },
+      {
+        "name": "La regla de la escala por gravedad",
+        "body": "El tamaño del veredicto depende de su gravedad: Peligroso es el más grande (34px, roseta de 112px), Sospechoso sigue (roseta de 100px), Desconocido y Sin detecciones son los más chicos (roseta de 92px).",
+        "section": "typography"
+      },
+      {
+        "name": "La regla de la única elevación",
+        "body": "El sello de veredicto es la única superficie elevada de la pantalla. Si algo más necesita destacarse, se resuelve con borde o fondo, no con sombra.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** mostrar el veredicto siempre en el sello, arriba y aparte de la explicación de la IA.",
+      "**Do** acompañar cada color de veredicto con su palabra y su símbolo central.",
+      "**Do** usar la tinta fija de cada fuente en todos lados donde aparezca esa fuente.",
+      "**Do** escribir links, hashes y horas de emisión en Cascadia Mono.",
+      "**Do** mantener el tema claro: papel y celeste sobre tinta."
+    ],
+    "donts": [
+      "**Don't** usar guilloché fuera de la roseta del sello y del logo.",
+      "**Don't** dar sombra a ninguna superficie que no sea el sello.",
+      "**Don't** escribir \"seguro\" ni \"100%\" en ningún veredicto, consejo o estado.",
+      "**Don't** mostrar el dato analizado como link clickeable.",
+      "**Don't** usar las tintas de veredicto o de fuente como decoración."
+    ]
+  }
+}
