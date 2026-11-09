@@ -2,10 +2,9 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { analizarUrl } from './analizarUrl.js'
 import { configurarPortapapeles } from './portapapeles.js'
-import { analizarArchivo } from './analizarArchivo.js'
 import { estadoDefender } from './defender.js'
+import { adjuntarArchivo, quitarAdjunto, analizarMensaje, responder } from './chat.js'
 
 // Solo aceptamos pedidos IPC que vengan de nuestra propia página (no de otro contenido cargado).
 function remitenteValido(event) {
@@ -19,11 +18,15 @@ function remitenteValido(event) {
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1120,
+    height: 780,
+    minWidth: 720,
+    minHeight: 560,
+    title: 'VigIA',
+    backgroundColor: '#EEF4F8', // el mismo fondo de la interfaz: sin destello blanco al abrir
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       // Seguridad (ver CLAUDE.md): la interfaz no tiene acceso a Node ni al sistema.
@@ -69,16 +72,26 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.handle('analizar-url', (event, texto) => {
-    if (!remitenteValido(event)) return { error: 'Pedido rechazado.' }
-    return analizarUrl(texto) // analizarUrl valida el texto (tipo, largo, http/https)
-  })
-
   // Sin parámetros a propósito: la ruta la elige el usuario en el diálogo de Windows,
   // así la interfaz nunca puede pedir que se lea un archivo cualquiera.
-  ipcMain.handle('analizar-archivo', (event) => {
+  ipcMain.handle('adjuntar-archivo', (event) => {
+    if (!remitenteValido(event)) return { cancelado: true }
+    return adjuntarArchivo(BrowserWindow.fromWebContents(event.sender))
+  })
+
+  ipcMain.handle('quitar-adjunto', (event, id) => {
+    if (remitenteValido(event) && typeof id === 'string') quitarAdjunto(id)
+  })
+
+  // chat.js valida todo lo que llega (tipos, cantidades, largos e ids de adjuntos).
+  ipcMain.handle('analizar-mensaje', (event, texto, ids) => {
     if (!remitenteValido(event)) return { error: 'Pedido rechazado.' }
-    return analizarArchivo(BrowserWindow.fromWebContents(event.sender))
+    return analizarMensaje(texto, ids)
+  })
+
+  ipcMain.handle('responder', (event, historial, idAnalisis) => {
+    if (!remitenteValido(event)) return { error: 'Pedido rechazado.' }
+    return responder(historial, idAnalisis)
   })
 
   ipcMain.handle('estado-defender', (event) => {

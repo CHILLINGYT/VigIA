@@ -1,0 +1,15 @@
+// Renderiza un SVG a PNG con Electron (sin ventanas visibles). Uso: electron render.cjs <svg> <png> <tamaño>
+const { app, BrowserWindow } = require('electron')
+const fs = require('fs')
+const [svg, png, tam] = process.argv.slice(-3)
+app.disableHardwareAcceleration()
+app.whenReady().then(async () => {
+  const n = Number(tam)
+  const win = new BrowserWindow({ width: n, height: n, show: false, transparent: true, frame: false, webPreferences: { offscreen: true } })
+  const datos = 'data:image/svg+xml;base64,' + fs.readFileSync(svg).toString('base64')
+  await win.loadURL('data:text/html,' + encodeURIComponent(`<html><body style="margin:0;background:transparent"><img src="${datos}" width="${n}" height="${n}"></body></html>`))
+  await new Promise((r) => setTimeout(r, 400))
+  const img = await win.webContents.capturePage({ x: 0, y: 0, width: n, height: n })
+  fs.writeFileSync(png, img.resize({ width: n, height: n }).toPNG())
+  app.quit()
+})
