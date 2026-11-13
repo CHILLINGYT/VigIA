@@ -56,3 +56,36 @@ Cada decisión importante: contexto, opciones consideradas, decisión y consecue
 - **Contexto:** no había logo ni colores. Se ofrecieron cuatro mundos visuales (impresión de seguridad del DNI y los billetes, octógonos del etiquetado frontal, app cálida de consumo, y el estándar de los chats de IA) y Gian eligió "impresión de seguridad".
 - **Decisión:** azul tinta y celeste como el DNI; el veredicto es un sello con una roseta de guilloché (las líneas finas de los billetes) donde cada anillo es una fuente y se dibuja cuando esa fuente responde. Cada fuente tiene una tinta fija, como los colores de los billetes. El veredicto también se entiende sin color (palabra y símbolo). Tipografía Bodoni Moda (licencia libre OFL) solo para el nombre y los veredictos.
 - **Logo:** un ojo (VigIA = vigía) cuyo iris es una roseta de guilloché. Se genera con matemática en `app/scripts/generar-logo.mjs`, así se puede explicar y regenerar.
+
+## 2026-11-13: Cómo se interpreta un escaneo de Microsoft Defender
+
+- **Contexto:** `MpCmdRun.exe` devuelve 0 si no encontró nada y 2 si encontró algo. Lo probamos: con el archivo de prueba EICAR devolvió 2, y con un archivo que no existe **también** 2. La ayuda oficial lo confirma: 2 es "amenaza no resuelta **o error**; revisá el historial".
+- **Opciones:** (1) confiar en el código; (2) mirar además el historial de Defender; (3) leer lo que escribe `MpCmdRun`.
+- **Decisión:** escaneo de la PC (rápido o completo) → se anota la hora, se escanea y se buscan en el historial las detecciones posteriores a esa hora (`core/escaneoDefender.js`). Escaneo de un archivo adjunto → se usa `-DisableRemediation` (Defender no borra ni mueve el archivo), y como así la detección **no** queda en el historial, se lee la salida de `MpCmdRun` ("found N threats", "Threat : nombre"). En los dos casos, un 2 sin amenazas es un error, nunca "limpio".
+- **Consecuencias:** funciona sin administrador (probado). Cancelar un escaneo sí pide administrador, así que desde VigIA no se puede cancelar. Los archivos se escanean de a uno (cola).
+
+## 2026-11-13: Defender en el veredicto de los archivos
+
+- **Contexto:** un archivo propio (una foto, un documento) casi nunca está en MalwareBazaar ni VirusTotal, así que siempre daba "desconocido".
+- **Decisión:** Defender es una fuente más (`core/scoring.js`). Si lo detecta → peligroso. Si no lo detecta y las bases **respondieron** pero no conocen el archivo → "sin detecciones" ("no encontramos amenazas conocidas"). Si alguna base dio error, sigue siendo "desconocido": Defender solo no alcanza.
+- **Consecuencias:** el motivo ahora nombra quién lo revisó ("Lo revisaron: MalwareBazaar, VirusTotal y Microsoft Defender"), lo que además evita que la IA invente fuentes.
+
+## 2026-11-13: "Analizá mi PC" con una regla, no con la IA
+
+- **Contexto:** el chat mandaba esos pedidos a la IA, que no puede escanear y respondía inventando pasos.
+- **Opciones:** (1) *tool calling*, que la IA decida cuándo escanear; (2) una regla fija que reconozca el pedido.
+- **Decisión:** opción 2 (`core/pedidoEscaneo.js`), siguiendo la decisión del 2026-11-08: la IA no tiene herramientas. La regla prefiere no escanear antes que escanear de más ("¿qué es un virus?" va a la IA); para los casos que no reconoce están los botones.
+
+## 2026-11-13: Lo que recibe la IA (privacidad)
+
+- **Contexto:** probando, vimos que a la IA le llegaba el nombre del archivo, y uno tenía el nombre completo de una persona. `CLAUDE.md` dice que de la PC solo salen huellas y URLs.
+- **Decisión:** todo lo que va a la IA pasa por `core/paraLaIA.js`: de un archivo, solo "un archivo .pdf" (`core/archivoParaIA.js`); de un mail, solo "un mail"; nunca rutas ni contenido. Los motivos sí van, porque son los que la IA explica.
+- **Consecuencias:** hay tests que lo comprueban, incluido el de prompt injection con un mail.
+
+## 2026-11-13: Análisis de mails
+
+- **Parser:** `postal-mime` 4.2.0 (sin dependencias, licencia MIT-0), con versión fija. Se descartó `mailparser` (8 dependencias) y hacerlo a mano (fácil de romper con mails raros). Se eligió la 4.2.0 y no la 4.2.1 porque esta salió hacía 3 días.
+- **Señales** (`core/senalesMail.js`, `core/adjuntosMail.js`): DMARC/SPF del **primer** `Authentication-Results` (lo escribe el último servidor, por ejemplo Gmail; los de abajo los puede escribir el estafador); SPF que falla con DKIM que pasa no cuenta (pasa con los reenvíos); Reply-To a otro dominio; nombre visible de una marca desde un dominio no oficial; links cuyo texto muestra una dirección y llevan a otra; adjuntos riesgosos. De un zip solo se lee el índice, sin descomprimir.
+- **Veredicto** (`core/veredictoMail.js`): peligroso con 3 señales o más, o si un link es peligroso; sospechoso con 1 o 2; desconocido si no hay señales pero el mail no trae autenticación; si no, sin detecciones. Se analizan los primeros 2 links (cuotas de VirusTotal), primero los engañosos.
+- **Texto oculto:** `CLAUDE.md` pide quitarlo antes de mandar contenido a la IA. Como del mail no se manda contenido, no hizo falta; el test de injection lo comprueba.
+- **Pendiente:** pegar el "mensaje original" como texto (el chat acepta hasta 4000 caracteres) y revisar los adjuntos del mail con VirusTotal o Defender.
