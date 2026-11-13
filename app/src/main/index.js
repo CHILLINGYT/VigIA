@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { configurarPortapapeles } from './portapapeles.js'
-import { estadoDefender } from './defender.js'
+import { estadoDefender, historialDefender } from './defender.js'
 import { adjuntarArchivo, quitarAdjunto, analizarMensaje, responder } from './chat.js'
 
 // Solo aceptamos pedidos IPC que vengan de nuestra propia página (no de otro contenido cargado).
@@ -97,6 +97,12 @@ app.whenReady().then(() => {
   ipcMain.handle('estado-defender', (event) => {
     if (!remitenteValido(event)) return null
     return estadoDefender()
+  })
+
+  // Sin parámetros: el comando de Defender es fijo, la interfaz no puede cambiar qué se ejecuta.
+  ipcMain.handle('historial-defender', (event) => {
+    if (!remitenteValido(event)) return null
+    return historialDefender()
   })
 
   ipcMain.handle('portapapeles', async (event, activo) => {

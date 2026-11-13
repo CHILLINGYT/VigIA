@@ -5,6 +5,7 @@
 import { execFile } from 'child_process'
 import { join } from 'path'
 import { interpretarEstadoDefender } from '../core/estadoDefender.js'
+import { interpretarHistorial } from '../core/historialDefender.js'
 
 // Ruta completa: si escribiéramos solo "powershell.exe", Windows lo buscaría en el PATH
 // y otro programa podría hacerse pasar por PowerShell.
@@ -33,6 +34,35 @@ function leerEstado() {
           resolve(JSON.parse(salida))
         } catch {
           resolve(null)
+        }
+      }
+    )
+  })
+}
+
+// Historial de amenazas que Defender encontró en esta PC (Get-MpThreatDetection + Get-MpThreat).
+// Probado sin permisos de administrador: funciona (2026-11-12, con el archivo de prueba EICAR).
+// El comando es fijo. Pedimos solo los campos que usamos y salida en UTF-8,
+// para que las rutas con tildes o ñ lleguen bien.
+const COMANDO_HISTORIAL = [
+  '[Console]::OutputEncoding = [Text.Encoding]::UTF8',
+  '$d = @(Get-MpThreatDetection | Select-Object ThreatID, ThreatStatusID, InitialDetectionTime, Resources)',
+  '$a = @(Get-MpThreat | Select-Object ThreatID, ThreatName, SeverityID)',
+  '@{ detecciones = $d; amenazas = $a } | ConvertTo-Json -Depth 4 -Compress'
+].join('; ')
+
+export function historialDefender() {
+  return new Promise((resolve) => {
+    execFile(
+      POWERSHELL,
+      ['-NoProfile', '-NonInteractive', '-Command', COMANDO_HISTORIAL],
+      { timeout: 30000, windowsHide: true, maxBuffer: 5 * 1024 * 1024 },
+      (error, salida) => {
+        if (error) return resolve(interpretarHistorial(null))
+        try {
+          resolve(interpretarHistorial(JSON.parse(salida)))
+        } catch {
+          resolve(interpretarHistorial(null))
         }
       }
     )

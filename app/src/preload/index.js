@@ -16,6 +16,8 @@ const api = {
 
   // Estado de Microsoft Defender: { estado, puedeEscanear, aviso }.
   estadoDefender: () => ipcRenderer.invoke('estado-defender'),
+  // Amenazas que Defender ya registró: { ok, amenazas, resumen, conclusion }. No escanea nada nuevo.
+  historialDefender: () => ipcRenderer.invoke('historial-defender'),
 
   // Prende o apaga la vigilancia del portapapeles (true / false).
   vigilarPortapapeles: (activo) => ipcRenderer.invoke('portapapeles', activo),

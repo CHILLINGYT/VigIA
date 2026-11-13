@@ -737,6 +737,92 @@ button:disabled {
   color: var(--texto-2);
 }
 
+/* ---------- Historial de Defender ---------- */
+
+.boton-lateral {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radio);
+  font-size: 13px;
+  text-align: left;
+}
+.boton-lateral:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.05);
+}
+.boton-lateral:disabled {
+  opacity: 0.5;
+}
+.boton-lateral svg {
+  flex: none;
+}
+
+/* Misma tarjeta que el sello, pero sin la roseta */
+.sello.historial {
+  grid-template-columns: 1fr;
+}
+.historial-lista {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 6px 0 2px;
+}
+.historial-lista li {
+  --color-estado: var(--desconocido);
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--color-estado);
+  border-radius: 6px;
+  background: var(--fondo);
+  font-size: 13px;
+  color: var(--texto-2);
+  min-width: 0;
+}
+.historial-lista li.resuelta {
+  --color-estado: var(--sin-detecciones);
+}
+.historial-lista li.permitida {
+  --color-estado: var(--sospechoso);
+}
+.historial-lista li.sin_resolver {
+  --color-estado: var(--peligroso);
+}
+.historial-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.historial-nombre {
+  font-family: var(--letra-maquina);
+  font-weight: 600;
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+.historial-estado {
+  flex: none;
+  font-weight: 600;
+  color: var(--color-estado);
+}
+.historial-ubicacion {
+  display: grid;
+  min-width: 0;
+}
+.historial-ubicacion b {
+  font-weight: 600;
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+.historial-ubicacion small {
+  font-family: var(--letra-maquina);
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+}
+
 /* Entrada de mensajes: un solo movimiento, sutil */
 .entra {
   animation: entrar 360ms var(--curva) both;

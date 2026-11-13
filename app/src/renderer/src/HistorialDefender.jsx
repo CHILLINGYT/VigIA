@@ -1,0 +1,86 @@
+// Tarjeta con el historial de amenazas de Microsoft Defender.
+// No decide nada: muestra la conclusión que ya calculó core/historialDefender.js.
+import marca from './assets/marca.svg'
+
+const ESTADOS = {
+  resuelta: 'Resuelta',
+  permitida: 'Permitida',
+  sin_resolver: 'Sin resolver',
+  desconocido: 'Estado desconocido'
+}
+
+const fechaLegible = (iso) =>
+  iso
+    ? new Date(iso).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })
+    : 'fecha desconocida'
+
+// Mostramos el nombre del archivo grande y la carpeta chica: es más fácil de reconocer.
+function Ubicacion({ ruta }) {
+  const partes = ruta.split('\\')
+  const nombre = partes.pop()
+  return (
+    <span className="historial-ubicacion">
+      <b>{nombre}</b>
+      {partes.length > 0 && <small>{partes.join('\\')}</small>}
+    </span>
+  )
+}
+
+export function HistorialDefender({ item }) {
+  return (
+    <div className="vigia entra">
+      <img className="vigia-avatar" src={marca} alt="" />
+      <div className="vigia-cuerpo">
+        {item.estado === 'cargando' ? (
+          <p className="pensando" role="status">
+            Leyendo el historial de Microsoft Defender…
+          </p>
+        ) : (
+          <Tarjeta datos={item.datos} hora={item.hora} />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Tarjeta({ datos, hora }) {
+  const { conclusion, amenazas = [] } = datos ?? {}
+  const nivel = conclusion?.nivel ?? 'desconocido'
+  return (
+    <section className={`sello historial ${nivel}`} aria-label="Historial de Microsoft Defender">
+      <div className="sello-cuerpo">
+        <div className="sello-encabezado">
+          <span className="sello-veredicto">
+            {conclusion?.titulo ?? 'No pudimos leer el historial'}
+          </span>
+          <span className="sello-folio">Defender {hora}</span>
+        </div>
+        {conclusion?.consejo && <p className="sello-consejo">{conclusion.consejo}</p>}
+
+        {amenazas.length > 0 && (
+          <ul className="historial-lista">
+            {amenazas.map((a, i) => (
+              <li key={i} className={a.estado}>
+                <div className="historial-fila">
+                  <span className="historial-nombre">{a.nombre}</span>
+                  <span className="historial-estado">{ESTADOS[a.estado]}</span>
+                </div>
+                <small>
+                  Detectada el {fechaLegible(a.fecha)}
+                  {a.gravedad && ` · gravedad ${a.gravedad}`}
+                </small>
+                {a.ubicaciones.map((u) => (
+                  <Ubicacion key={u} ruta={u} />
+                ))}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p className="sello-nota">
+          Esto es lo que Microsoft Defender tiene registrado en esta PC. No es un escaneo nuevo.
+        </p>
+      </div>
+    </section>
+  )
+}

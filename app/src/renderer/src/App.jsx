@@ -3,6 +3,7 @@ import marca from './assets/marca.svg'
 import marcaClara from './assets/marca-clara.svg'
 import { Sello, Roseta, Cortable } from './Sello.jsx'
 import { FUENTES } from './fuentes.js'
+import { HistorialDefender } from './HistorialDefender.jsx'
 import {
   IconoClip,
   IconoEnviar,
@@ -145,6 +146,8 @@ function App() {
     // Lo que la IA ve de la conversación: solo texto, los últimos mensajes.
     const historial = [
       ...conversacion
+        // El historial de Defender no va a la IA: tiene rutas de archivos de la PC.
+        .filter((i) => i.rol !== 'historial')
         .filter((i) => (i.rol === 'usuario' ? true : i.texto))
         .map((i) => ({
           rol: i.rol === 'usuario' ? 'usuario' : 'asistente',
@@ -201,6 +204,27 @@ function App() {
     }
   }
 
+  // Muestra lo que Defender ya registró. No pasa por la IA ni sale de la PC.
+  async function verHistorialDefender() {
+    if (ocupado) return
+    const id = nuevoId()
+    setConversacion((c) => [...c, { id, rol: 'historial', estado: 'cargando' }])
+    setOcupado(true)
+    try {
+      const datos = await window.vigia.historialDefender()
+      const hora = new Date().toLocaleTimeString('es-AR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
+      actualizar(id, { estado: 'listo', datos, hora })
+    } catch {
+      actualizar(id, { estado: 'listo', datos: null })
+    } finally {
+      setOcupado(false)
+    }
+  }
+
   function nuevaConversacion() {
     adjuntos.forEach((a) => window.vigia.quitarAdjunto(a.id))
     setConversacion([])
@@ -253,6 +277,15 @@ function App() {
               Microsoft Defender está activo y protege tu PC en tiempo real.
             </p>
           )}
+          <button
+            type="button"
+            className="boton-lateral"
+            onClick={verHistorialDefender}
+            disabled={ocupado}
+          >
+            <IconoEscudo />
+            Ver qué encontró Defender
+          </button>
           <button
             type="button"
             role="switch"
@@ -337,6 +370,8 @@ function App() {
                       </p>
                     )}
                   </div>
+                ) : item.rol === 'historial' ? (
+                  <HistorialDefender key={item.id} item={item} />
                 ) : (
                   <RespuestaVigia key={item.id} item={item} />
                 )
