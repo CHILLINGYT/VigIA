@@ -3,6 +3,8 @@
 // No decide el veredicto: devuelve señales [{ tipo, detalle }] que después usa el scoring.
 
 import { analizarDominio, marcaFalsa } from './dominiosParecidos.js'
+import { extraerUrls } from './extraerUrls.js'
+import { limpiarUrl } from './limpiarUrl.js'
 
 const dominioDe = (direccion) =>
   String(direccion ?? '')
@@ -83,4 +85,53 @@ export function senalesDelMail(mail) {
     asunto: mail?.subject ?? '',
     senales
   }
+}
+
+// ---------- Links del mail ----------
+
+const LARGO_MAXIMO_HTML = 2_000_000 // un mail más grande no se revisa entero (no vale la pena)
+// shortcut: busca <a href="...">texto</a> con una expresión regular, no con un lector de HTML
+// completo. Alcanza para los mails normales; si aparecen trucos de HTML raros, usar un parser.
+const PATRON_LINK = /<a\b[^>]*?\bhref\s*=\s*(["'])(.*?)\1[^>]*>([\s\S]*?)<\/a>/gi
+const ENTIDADES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', '#39': "'" }
+
+const textoVisible = (html) =>
+  html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&(amp|lt|gt|quot|apos|nbsp|#39);/g, (_, e) => ENTIDADES[e])
+    .trim()
+
+const hostDe = (url) => new URL(url).hostname.toLowerCase().replace(/^www\./, '')
+
+// Devuelve { links, senales }. links: URLs del mail (primero las engañosas, que son las que más
+// conviene analizar). senales: links cuyo texto muestra una dirección pero llevan a otra.
+export function linksDelMail(mail) {
+  const html = typeof mail?.html === 'string' ? mail.html.slice(0, LARGO_MAXIMO_HTML) : ''
+  const enganosos = []
+  const normales = []
+  const senales = []
+
+  for (const [, , href, contenido] of html.matchAll(PATRON_LINK)) {
+    const destino = limpiarUrl(textoVisible(href))
+    if (!destino) continue // mailto:, javascript:, links rotos
+    const texto = textoVisible(contenido)
+    // Solo comparamos si el texto PARECE una dirección ("www…" o "http…").
+    const mostrado = /^(https?:\/\/|www\.)/i.test(texto)
+      ? limpiarUrl(/^https?:\/\//i.test(texto) ? texto : `https://${texto}`)
+      : null
+    if (mostrado && !mismoDominio(hostDe(mostrado), hostDe(destino))) {
+      enganosos.push(destino)
+      senales.push({
+        tipo: 'link_enganoso',
+        detalle: `Un link muestra "${hostDe(mostrado)}" pero en realidad te lleva a ${hostDe(destino)}.`
+      })
+    } else {
+      normales.push(destino)
+    }
+  }
+
+  const links = [...new Set([...enganosos, ...normales, ...extraerUrls(mail?.text)])]
+  // El mismo truco repetido en varios links es una sola señal.
+  const unicas = [...new Map(senales.map((s) => [s.detalle, s])).values()]
+  return { links, senales: unicas }
 }
