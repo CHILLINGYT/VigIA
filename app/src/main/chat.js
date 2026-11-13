@@ -7,6 +7,7 @@
 
 import { extraerUrls } from '../core/extraerUrls.js'
 import { esPedidoDeEscaneo } from '../core/pedidoEscaneo.js'
+import { archivoParaIA } from '../core/archivoParaIA.js'
 import { analizarUrl } from './analizarUrl.js'
 import { analizarRuta, elegirArchivo } from './analizarArchivo.js'
 import { consultarProxy } from './proxy.js'
@@ -75,10 +76,16 @@ export async function responder(historial, idAnalisis) {
 
   const resultados = analisisPendientes.get(idAnalisis) ?? []
   analisisPendientes.delete(idAnalisis)
-  // A la IA le mandamos solo lo necesario: tipo, link o nombre, veredicto y motivos. Nunca la ruta.
+  // A la IA le mandamos solo lo necesario: tipo, link, veredicto y motivos.
+  // De un archivo, ni la ruta ni el nombre: solo "un archivo .pdf" (puede tener datos personales).
   const analisis = resultados
     .filter((r) => !r.error)
-    .map(({ tipo, objetivo, veredicto, motivos }) => ({ tipo, objetivo, veredicto, motivos }))
+    .map(({ tipo, objetivo, veredicto, motivos }) => ({
+      tipo,
+      objetivo: tipo === 'archivo' ? archivoParaIA(objetivo) : objetivo,
+      veredicto,
+      motivos
+    }))
 
   const proxy = await consultarProxy('/chat', { historial, analisis })
   if (proxy.problema || typeof proxy.respuesta !== 'string') {

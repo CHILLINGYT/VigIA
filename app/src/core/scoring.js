@@ -16,6 +16,14 @@ export const FUENTES_ARCHIVO = ['malwarebazaar', 'virustotal']
 // Con 1 o 2 puede ser un falso positivo: queda como "sospechoso".
 const MINIMO_MOTORES_PELIGROSO = 3
 
+const NOMBRES = {
+  google_safe_browsing: 'Google Safe Browsing',
+  urlhaus: 'URLhaus',
+  malwarebazaar: 'MalwareBazaar',
+  virustotal: 'VirusTotal',
+  defender: 'Microsoft Defender'
+}
+
 const AMENAZAS_GOOGLE = {
   SOCIAL_ENGINEERING: 'un engaño (phishing)',
   MALWARE: 'software malicioso',
@@ -91,8 +99,14 @@ export function calcularVeredicto(fuentes, senales = [], esperadas = FUENTES_LIN
       motivos: ['No pudimos consultar todas las fuentes o no tienen datos sobre esto.']
     }
   }
+  // Nombramos quién lo revisó: así la IA no inventa fuentes (pasó el 2026-11-13).
+  const revisaron = lista
+    .filter((f) => ['no_detectado', 'sin_datos'].includes(f?.resultado) && NOMBRES[f.fuente])
+    .map((f) => NOMBRES[f.fuente])
   return {
     veredicto: 'sin_detecciones',
-    motivos: ['No encontramos amenazas conocidas en las fuentes consultadas.']
+    motivos: [
+      `No encontramos amenazas conocidas. Lo revisaron: ${revisaron.join(', ').replace(/, ([^,]*)$/, ' y $1')}.`
+    ]
   }
 }

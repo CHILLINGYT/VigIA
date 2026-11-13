@@ -149,3 +149,20 @@ test('archivos con Defender: un archivo propio que nadie conoce y Defender no ma
   const sinDefender = [...propio.slice(0, 2), { fuente: 'defender', resultado: 'error' }]
   assert.equal(calcularVeredicto(sinDefender, [], FUENTES_ARCHIVO).veredicto, 'desconocido')
 })
+
+test('sin detecciones: el motivo nombra solo las fuentes que lo revisaron', () => {
+  const archivo = calcularVeredicto(
+    [
+      { fuente: 'malwarebazaar', resultado: 'sin_datos' },
+      { fuente: 'virustotal', resultado: 'sin_datos' },
+      { fuente: 'defender', resultado: 'no_detectado' }
+    ],
+    [],
+    FUENTES_ARCHIVO
+  )
+  assert.deepEqual(archivo.motivos, [
+    'No encontramos amenazas conocidas. Lo revisaron: MalwareBazaar, VirusTotal y Microsoft Defender.'
+  ])
+  // Para un archivo nunca aparecen fuentes de links.
+  assert.doesNotMatch(archivo.motivos[0], /Google|URLhaus/)
+})
