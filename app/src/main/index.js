@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { configurarPortapapeles } from './portapapeles.js'
-import { estadoDefender, historialDefender } from './defender.js'
+import { estadoDefender, historialDefender, escanearPc } from './defender.js'
 import { adjuntarArchivo, quitarAdjunto, analizarMensaje, responder } from './chat.js'
 
 // Solo aceptamos pedidos IPC que vengan de nuestra propia página (no de otro contenido cargado).
@@ -103,6 +103,12 @@ app.whenReady().then(() => {
   ipcMain.handle('historial-defender', (event) => {
     if (!remitenteValido(event)) return null
     return historialDefender()
+  })
+
+  // Sin parámetros: siempre es el escaneo rápido, la interfaz no elige qué ni dónde se escanea.
+  ipcMain.handle('escanear-pc', (event) => {
+    if (!remitenteValido(event)) return null
+    return escanearPc()
   })
 
   ipcMain.handle('portapapeles', async (event, activo) => {

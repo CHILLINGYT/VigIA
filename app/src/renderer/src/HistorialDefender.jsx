@@ -33,17 +33,19 @@ export function HistorialDefender({ item }) {
       <div className="vigia-cuerpo">
         {item.estado === 'cargando' ? (
           <p className="pensando" role="status">
-            Leyendo el historial de Microsoft Defender…
+            {item.tipo === 'escaneo'
+              ? 'Defender está revisando tu PC. Tarda unos 5 minutos: podés seguir usando VigIA mientras tanto.'
+              : 'Leyendo el historial de Microsoft Defender…'}
           </p>
         ) : (
-          <Tarjeta datos={item.datos} hora={item.hora} />
+          <Tarjeta datos={item.datos} hora={item.hora} tipo={item.tipo} />
         )}
       </div>
     </div>
   )
 }
 
-function Tarjeta({ datos, hora }) {
+function Tarjeta({ datos, hora, tipo }) {
   const { conclusion, amenazas = [] } = datos ?? {}
   const nivel = conclusion?.nivel ?? 'desconocido'
   return (
@@ -78,7 +80,9 @@ function Tarjeta({ datos, hora }) {
         )}
 
         <p className="sello-nota">
-          Esto es lo que Microsoft Defender tiene registrado en esta PC. No es un escaneo nuevo.
+          {tipo === 'escaneo'
+            ? 'Escaneo rápido de Microsoft Defender: revisa los lugares donde suele esconderse el malware, no todos los archivos. Puede no conocer amenazas muy nuevas.'
+            : 'Esto es lo que Microsoft Defender tiene registrado en esta PC. No es un escaneo nuevo.'}
         </p>
       </div>
     </section>

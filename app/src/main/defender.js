@@ -6,6 +6,7 @@ import { execFile } from 'child_process'
 import { join } from 'path'
 import { interpretarEstadoDefender } from '../core/estadoDefender.js'
 import { interpretarHistorial } from '../core/historialDefender.js'
+import { concluirEscaneo, amenazasDesde } from '../core/escaneoDefender.js'
 
 // Ruta completa: si escribiéramos solo "powershell.exe", Windows lo buscaría en el PATH
 // y otro programa podría hacerse pasar por PowerShell.
@@ -67,6 +68,57 @@ export function historialDefender() {
       }
     )
   })
+}
+
+// Escaneo rápido de Defender (MpCmdRun -Scan -ScanType 1). Funciona sin administrador.
+// Ruta completa por el mismo motivo que PowerShell: que no lo reemplace otro programa del PATH.
+const MPCMDRUN = join(
+  process.env.ProgramFiles ?? 'C:\\Program Files',
+  'Windows Defender',
+  'MpCmdRun.exe'
+)
+
+function correrEscaneoRapido() {
+  return new Promise((resolve) => {
+    execFile(
+      MPCMDRUN,
+      ['-Scan', '-ScanType', '1'],
+      // En la PC de Gian tardó 4,5 minutos; damos hasta 30 antes de cortarlo.
+      { timeout: 30 * 60 * 1000, windowsHide: true },
+      (error) => {
+        if (!error) return resolve(0)
+        // Terminó con otro código (por ejemplo 2) → lo devolvemos. Si se cortó o no arrancó → null.
+        resolve(typeof error.code === 'number' && !error.killed ? error.code : null)
+      }
+    )
+  })
+}
+
+// Un solo escaneo a la vez: si se pide otro mientras corre, se devuelve el mismo.
+let escaneoEnCurso = null
+export function escanearPc() {
+  escaneoEnCurso ??= (async () => {
+    const { puedeEscanear, aviso } = await estadoDefender()
+    if (!puedeEscanear) {
+      return {
+        amenazas: [],
+        conclusion: {
+          nivel: 'desconocido',
+          titulo: 'No podemos escanear con Defender',
+          consejo: aviso
+        }
+      }
+    }
+    const inicio = Date.now()
+    const codigo = await correrEscaneoRapido()
+    // El código 2 puede ser amenaza o error: lo que decide es qué apareció en el historial.
+    const { amenazas } = await historialDefender()
+    const nuevas = amenazasDesde(amenazas, inicio)
+    return { amenazas: nuevas, conclusion: concluirEscaneo(codigo, nuevas) }
+  })().finally(() => {
+    escaneoEnCurso = null
+  })
+  return escaneoEnCurso
 }
 
 // Se lee una vez al iniciar la app (CLAUDE.md) y se reutiliza.

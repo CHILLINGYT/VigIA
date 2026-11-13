@@ -99,6 +99,7 @@ function App() {
   const [texto, setTexto] = useState('')
   const [adjuntos, setAdjuntos] = useState([]) // [{ id, nombre }]
   const [ocupado, setOcupado] = useState(false)
+  const [escaneando, setEscaneando] = useState(false)
   const [defender, setDefender] = useState(null)
   const [vigilando, setVigilando] = useState(false)
   const [copiadas, setCopiadas] = useState([])
@@ -225,6 +226,27 @@ function App() {
     }
   }
 
+  // El escaneo tarda minutos: no bloquea el chat (por eso usa "escaneando" y no "ocupado").
+  async function escanearPc() {
+    if (escaneando) return
+    const id = nuevoId()
+    setConversacion((c) => [...c, { id, rol: 'historial', tipo: 'escaneo', estado: 'cargando' }])
+    setEscaneando(true)
+    try {
+      const datos = await window.vigia.escanearPc()
+      const hora = new Date().toLocaleTimeString('es-AR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
+      actualizar(id, { estado: 'listo', datos, hora })
+    } catch {
+      actualizar(id, { estado: 'listo', datos: null })
+    } finally {
+      setEscaneando(false)
+    }
+  }
+
   function nuevaConversacion() {
     adjuntos.forEach((a) => window.vigia.quitarAdjunto(a.id))
     setConversacion([])
@@ -285,6 +307,15 @@ function App() {
           >
             <IconoEscudo />
             Ver qué encontró Defender
+          </button>
+          <button
+            type="button"
+            className="boton-lateral"
+            onClick={escanearPc}
+            disabled={escaneando || defender?.puedeEscanear === false}
+          >
+            <IconoEscudo />
+            {escaneando ? 'Escaneando tu PC…' : 'Escanear mi PC (rápido)'}
           </button>
           <button
             type="button"

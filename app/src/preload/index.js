@@ -18,6 +18,8 @@ const api = {
   estadoDefender: () => ipcRenderer.invoke('estado-defender'),
   // Amenazas que Defender ya registró: { ok, amenazas, resumen, conclusion }. No escanea nada nuevo.
   historialDefender: () => ipcRenderer.invoke('historial-defender'),
+  // Escaneo rápido de Defender (unos minutos). Devuelve { amenazas, conclusion }.
+  escanearPc: () => ipcRenderer.invoke('escanear-pc'),
 
   // Prende o apaga la vigilancia del portapapeles (true / false).
   vigilarPortapapeles: (activo) => ipcRenderer.invoke('portapapeles', activo),
