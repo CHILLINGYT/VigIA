@@ -33,19 +33,21 @@ export function HistorialDefender({ item }) {
       <div className="vigia-cuerpo">
         {item.estado === 'cargando' ? (
           <p className="pensando" role="status">
-            {item.tipo === 'escaneo'
-              ? 'Defender está revisando tu PC. Tarda unos 5 minutos: podés seguir usando VigIA mientras tanto.'
-              : 'Leyendo el historial de Microsoft Defender…'}
+            {item.tipo !== 'escaneo'
+              ? 'Leyendo el historial de Microsoft Defender…'
+              : item.modo === 'completo'
+                ? 'Defender está revisando todos los archivos de tu PC. Puede tardar horas: podés seguir usando VigIA, pero no la cierres.'
+                : 'Defender está revisando tu PC. Tarda unos 5 minutos: podés seguir usando VigIA mientras tanto.'}
           </p>
         ) : (
-          <Tarjeta datos={item.datos} hora={item.hora} tipo={item.tipo} />
+          <Tarjeta datos={item.datos} hora={item.hora} tipo={item.tipo} modo={item.modo} />
         )}
       </div>
     </div>
   )
 }
 
-function Tarjeta({ datos, hora, tipo }) {
+function Tarjeta({ datos, hora, tipo, modo }) {
   const { conclusion, amenazas = [] } = datos ?? {}
   const nivel = conclusion?.nivel ?? 'desconocido'
   return (
@@ -80,9 +82,11 @@ function Tarjeta({ datos, hora, tipo }) {
         )}
 
         <p className="sello-nota">
-          {tipo === 'escaneo'
-            ? 'Escaneo rápido de Microsoft Defender: revisa los lugares donde suele esconderse el malware, no todos los archivos. Puede no conocer amenazas muy nuevas.'
-            : 'Esto es lo que Microsoft Defender tiene registrado en esta PC. No es un escaneo nuevo.'}
+          {tipo !== 'escaneo'
+            ? 'Esto es lo que Microsoft Defender tiene registrado en esta PC. No es un escaneo nuevo.'
+            : modo === 'completo'
+              ? 'Escaneo completo de Microsoft Defender: revisó todos los archivos. Puede no conocer amenazas muy nuevas.'
+              : 'Escaneo rápido de Microsoft Defender: revisa los lugares donde suele esconderse el malware, no todos los archivos. Puede no conocer amenazas muy nuevas.'}
         </p>
       </div>
     </section>

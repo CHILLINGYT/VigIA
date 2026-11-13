@@ -70,7 +70,7 @@ export function historialDefender() {
   })
 }
 
-// Escaneo rápido de Defender (MpCmdRun -Scan -ScanType 1). Funciona sin administrador.
+// Escaneos de Defender con MpCmdRun. El rápido funciona sin administrador (probado 2026-11-13).
 // Ruta completa por el mismo motivo que PowerShell: que no lo reemplace otro programa del PATH.
 const MPCMDRUN = join(
   process.env.ProgramFiles ?? 'C:\\Program Files',
@@ -78,13 +78,20 @@ const MPCMDRUN = join(
   'MpCmdRun.exe'
 )
 
-function correrEscaneoRapido() {
+// Los únicos escaneos permitidos. La interfaz solo puede elegir el nombre, nunca los argumentos.
+const TIPOS_ESCANEO = {
+  // En la PC de Gian tardó 4,5 minutos; damos hasta 30 antes de cortarlo.
+  rapido: { scanType: '1', limite: 30 * 60 * 1000 },
+  // shortcut: el completo puede tardar horas y no se puede cancelar desde VigIA; si hace falta, agregar un botón "Cancelar".
+  completo: { scanType: '2', limite: 12 * 60 * 60 * 1000 }
+}
+
+function correrEscaneo({ scanType, limite }) {
   return new Promise((resolve) => {
     execFile(
       MPCMDRUN,
-      ['-Scan', '-ScanType', '1'],
-      // En la PC de Gian tardó 4,5 minutos; damos hasta 30 antes de cortarlo.
-      { timeout: 30 * 60 * 1000, windowsHide: true },
+      ['-Scan', '-ScanType', scanType],
+      { timeout: limite, windowsHide: true },
       (error) => {
         if (!error) return resolve(0)
         // Terminó con otro código (por ejemplo 2) → lo devolvemos. Si se cortó o no arrancó → null.
@@ -96,7 +103,8 @@ function correrEscaneoRapido() {
 
 // Un solo escaneo a la vez: si se pide otro mientras corre, se devuelve el mismo.
 let escaneoEnCurso = null
-export function escanearPc() {
+export function escanearPc(tipo) {
+  if (!Object.hasOwn(TIPOS_ESCANEO, tipo)) return Promise.resolve(null)
   escaneoEnCurso ??= (async () => {
     const { puedeEscanear, aviso } = await estadoDefender()
     if (!puedeEscanear) {
@@ -110,11 +118,11 @@ export function escanearPc() {
       }
     }
     const inicio = Date.now()
-    const codigo = await correrEscaneoRapido()
+    const codigo = await correrEscaneo(TIPOS_ESCANEO[tipo])
     // El código 2 puede ser amenaza o error: lo que decide es qué apareció en el historial.
     const { amenazas } = await historialDefender()
     const nuevas = amenazasDesde(amenazas, inicio)
-    return { amenazas: nuevas, conclusion: concluirEscaneo(codigo, nuevas) }
+    return { amenazas: nuevas, conclusion: concluirEscaneo(codigo, nuevas, tipo) }
   })().finally(() => {
     escaneoEnCurso = null
   })

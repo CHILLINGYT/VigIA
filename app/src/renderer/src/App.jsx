@@ -227,13 +227,16 @@ function App() {
   }
 
   // El escaneo tarda minutos: no bloquea el chat (por eso usa "escaneando" y no "ocupado").
-  async function escanearPc() {
+  async function escanearPc(modo) {
     if (escaneando) return
     const id = nuevoId()
-    setConversacion((c) => [...c, { id, rol: 'historial', tipo: 'escaneo', estado: 'cargando' }])
+    setConversacion((c) => [
+      ...c,
+      { id, rol: 'historial', tipo: 'escaneo', modo, estado: 'cargando' }
+    ])
     setEscaneando(true)
     try {
-      const datos = await window.vigia.escanearPc()
+      const datos = await window.vigia.escanearPc(modo)
       const hora = new Date().toLocaleTimeString('es-AR', {
         hour: '2-digit',
         minute: '2-digit',
@@ -311,11 +314,20 @@ function App() {
           <button
             type="button"
             className="boton-lateral"
-            onClick={escanearPc}
+            onClick={() => escanearPc('rapido')}
             disabled={escaneando || defender?.puedeEscanear === false}
           >
             <IconoEscudo />
             {escaneando ? 'Escaneando tu PC…' : 'Escanear mi PC (rápido)'}
+          </button>
+          <button
+            type="button"
+            className="boton-lateral"
+            onClick={() => escanearPc('completo')}
+            disabled={escaneando || defender?.puedeEscanear === false}
+          >
+            <IconoEscudo />
+            Escanear todo (puede tardar horas)
           </button>
           <button
             type="button"

@@ -10,6 +10,11 @@ test('código 0 y nada nuevo: no encontramos amenazas conocidas (caso real)', ()
   assert.doesNotMatch(`${r.titulo} ${r.consejo}`, /limpi[ao]|100%|segur[ao]/i)
 })
 
+test('el texto dice qué tipo de escaneo se hizo', () => {
+  assert.match(concluirEscaneo(0, []).consejo, /rápido/)
+  assert.match(concluirEscaneo(0, [], 'completo').consejo, /todos los archivos/)
+})
+
 test('código 2 con amenaza nueva: peligroso (caso real con EICAR)', () => {
   assert.equal(concluirEscaneo(2, [amenaza('sin_resolver')]).nivel, 'peligroso')
 })

@@ -105,10 +105,11 @@ app.whenReady().then(() => {
     return historialDefender()
   })
 
-  // Sin parámetros: siempre es el escaneo rápido, la interfaz no elige qué ni dónde se escanea.
-  ipcMain.handle('escanear-pc', (event) => {
-    if (!remitenteValido(event)) return null
-    return escanearPc()
+  // La interfaz solo elige 'rapido' o 'completo' (escanearPc rechaza cualquier otra cosa):
+  // nunca elige rutas ni argumentos de MpCmdRun.
+  ipcMain.handle('escanear-pc', (event, tipo) => {
+    if (!remitenteValido(event) || typeof tipo !== 'string') return null
+    return escanearPc(tipo)
   })
 
   ipcMain.handle('portapapeles', async (event, activo) => {

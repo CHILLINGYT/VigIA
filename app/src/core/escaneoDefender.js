@@ -13,7 +13,8 @@ const TEXTO_SEGURIDAD =
 
 // codigo: número de salida de MpCmdRun, o null si no llegó a terminar (no arrancó o se cortó).
 // nuevas: amenazas del historial detectadas desde que empezó el escaneo.
-export function concluirEscaneo(codigo, nuevas) {
+// tipo: 'rapido' o 'completo' (solo cambia cómo contamos qué se revisó).
+export function concluirEscaneo(codigo, nuevas, tipo = 'rapido') {
   const amenazas = Array.isArray(nuevas) ? nuevas : []
 
   if (amenazas.length > 0) {
@@ -47,7 +48,9 @@ export function concluirEscaneo(codigo, nuevas) {
       nivel: 'sin_detecciones',
       titulo: 'No encontramos amenazas conocidas',
       consejo:
-        'El escaneo rápido de Defender revisó los lugares donde suele esconderse el malware y no encontró nada conocido.'
+        tipo === 'completo'
+          ? 'El escaneo completo de Defender revisó todos los archivos de tu PC y no encontró nada conocido.'
+          : 'El escaneo rápido de Defender revisó los lugares donde suele esconderse el malware y no encontró nada conocido.'
     }
   }
 
