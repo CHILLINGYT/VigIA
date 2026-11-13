@@ -1,0 +1,13 @@
+Authentication-Results: mx.google.com;
+       spf=fail (google.com: domain of notificaciones@arca.gob.ar does not designate 203.0.113.50 as permitted sender) smtp.mailfrom=notificaciones@arca.gob.ar;
+       dkim=none;
+       dmarc=fail (p=REJECT sp=REJECT dis=QUARANTINE) header.from=arca.gob.ar
+From: "ARCA" <notificaciones@arca.gob.ar>
+To: persona@example.com
+Subject: Deuda pendiente
+Date: Thu, 12 Nov 2026 12:00:00 -0300
+Message-ID: <prueba-arca-1@example.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+
+Tenes una deuda pendiente. Pagala hoy.

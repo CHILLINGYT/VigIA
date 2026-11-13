@@ -19,7 +19,8 @@
     "test": "node --test src/core/ src/main/"
   },
   "dependencies": {
-    "@electron-toolkit/utils": "^4.0.0"
+    "@electron-toolkit/utils": "^4.0.0",
+    "postal-mime": "4.2.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^3.0.0",

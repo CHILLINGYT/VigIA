@@ -63,6 +63,25 @@ function distancia(a, b) {
 
 const esOficial = (host, marca) => marca.oficiales.some((d) => host === d || host.endsWith('.' + d))
 
+// ¿El texto (por ejemplo, el nombre visible de un mail: "Mercado Pago <x@gmail.com>") nombra
+// una marca, pero el dominio no es uno de sus oficiales? Devuelve el nombre de la marca o null.
+export function marcaFalsa(texto, dominio) {
+  const t = String(texto ?? '')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+  const palabras = t.split(/[^a-z0-9]+/).filter(Boolean)
+  const junto = palabras.join('')
+  const host = String(dominio ?? '').toLowerCase()
+  for (const marca of MARCAS) {
+    if (esOficial(host, marca)) continue
+    // Igual que con los dominios: las claves cortas (bna, arca) solo como palabra exacta.
+    if (marca.claves.some((c) => palabras.includes(c) || (c.length >= 6 && junto.includes(c))))
+      return marca.nombre
+  }
+  return null
+}
+
 // Devuelve una lista de señales [{ tipo, marca?, detalle }] sobre el dominio de la URL.
 // Lista vacía = no encontramos nada raro en el nombre (no quiere decir que sea seguro).
 export function analizarDominio(textoUrl) {

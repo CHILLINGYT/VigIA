@@ -1,0 +1,13 @@
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@mercadopago.com.ar;
+       spf=pass (google.com: domain of info@mercadopago.com.ar designates 198.51.100.10 as permitted sender) smtp.mailfrom=info@mercadopago.com.ar;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=mercadopago.com.ar
+From: "Mercado Pago" <info@mercadopago.com.ar>
+To: persona@example.com
+Subject: Recibiste un pago
+Date: Thu, 12 Nov 2026 11:00:00 -0300
+Message-ID: <prueba-legitimo-1@mercadopago.com.ar>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+
+Recibiste un pago. Podés verlo en https://www.mercadopago.com.ar/actividad
