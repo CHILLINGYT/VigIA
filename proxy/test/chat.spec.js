@@ -98,7 +98,7 @@ describe('POST /chat', () => {
 			{ historial: [{ rol: 'usuario', texto: 'x'.repeat(4001) }] },
 			{ historial: Array.from({ length: 21 }, () => ({ rol: 'usuario', texto: 'a' })) },
 			{ ...valido, analisis: [{ ...analisisPeligroso('https://a.test/'), veredicto: 'seguro' }] },
-			{ ...valido, analisis: [{ ...analisisPeligroso('https://a.test/'), tipo: 'mail' }] },
+			{ ...valido, analisis: [{ ...analisisPeligroso('https://a.test/'), tipo: 'programa' }] },
 		];
 		for (const cuerpo of malos) expect((await chat(cuerpo)).status, JSON.stringify(cuerpo).slice(0, 60)).toBe(400);
 		expect((await chat(valido, { token: null })).status).toBe(401);

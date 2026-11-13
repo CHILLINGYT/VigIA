@@ -30,7 +30,7 @@ function describirAnalisis(analisis) {
 	return analisis
 		.map((a, i) =>
 			[
-				`Análisis ${i + 1} (${a.tipo === 'archivo' ? 'archivo' : 'link'}): ${noConfiable(a.objetivo)}`,
+				`Análisis ${i + 1} (${a.tipo}): ${noConfiable(a.objetivo)}`,
 				`Veredicto calculado por las reglas: ${NOMBRES_VEREDICTO[a.veredicto]}`,
 				'Motivos:',
 				...a.motivos.map((m) => `- ${m}`),

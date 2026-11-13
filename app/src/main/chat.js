@@ -7,7 +7,8 @@
 
 import { extraerUrls } from '../core/extraerUrls.js'
 import { esPedidoDeEscaneo } from '../core/pedidoEscaneo.js'
-import { archivoParaIA } from '../core/archivoParaIA.js'
+import { paraLaIA } from '../core/paraLaIA.js'
+import { analizarMail } from './analizarMail.js'
 import { analizarUrl } from './analizarUrl.js'
 import { analizarRuta, elegirArchivo } from './analizarArchivo.js'
 import { consultarProxy } from './proxy.js'
@@ -48,10 +49,16 @@ export async function analizarMensaje(texto, ids) {
   if (elegidos.length === 0 && esPedidoDeEscaneo(texto)) return { escanear: true }
 
   const links = extraerUrls(texto).slice(0, MAXIMO_LINKS)
-  const resultados = await Promise.all([
-    ...links.map((link) => analizarUrl(link)),
-    ...elegidos.map(({ ruta }) => analizarRuta(ruta))
-  ])
+  // Un .eml es un mail: se analiza como mail (remitente, links, adjuntos), no como archivo.
+  // analizarMail devuelve varios resultados (el mail y sus links), por eso el flat().
+  const resultados = (
+    await Promise.all([
+      ...links.map((link) => analizarUrl(link)),
+      ...elegidos.map(({ ruta }) =>
+        /\.eml$/i.test(ruta) ? analizarMail(ruta) : analizarRuta(ruta)
+      )
+    ])
+  ).flat()
   const id = crypto.randomUUID()
   analisisPendientes.set(id, resultados)
   return { id, analisis: resultados }
@@ -76,16 +83,8 @@ export async function responder(historial, idAnalisis) {
 
   const resultados = analisisPendientes.get(idAnalisis) ?? []
   analisisPendientes.delete(idAnalisis)
-  // A la IA le mandamos solo lo necesario: tipo, link, veredicto y motivos.
-  // De un archivo, ni la ruta ni el nombre: solo "un archivo .pdf" (puede tener datos personales).
-  const analisis = resultados
-    .filter((r) => !r.error)
-    .map(({ tipo, objetivo, veredicto, motivos }) => ({
-      tipo,
-      objetivo: tipo === 'archivo' ? archivoParaIA(objetivo) : objetivo,
-      veredicto,
-      motivos
-    }))
+  // A la IA le mandamos solo lo necesario (core/paraLaIA.js). El proxy acepta hasta 5.
+  const analisis = paraLaIA(resultados).slice(0, 5)
 
   const proxy = await consultarProxy('/chat', { historial, analisis })
   if (proxy.problema || typeof proxy.respuesta !== 'string') {

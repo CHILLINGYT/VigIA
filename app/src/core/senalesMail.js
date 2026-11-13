@@ -83,6 +83,8 @@ export function senalesDelMail(mail) {
   return {
     remitente: { nombre, direccion, dominio },
     asunto: mail?.subject ?? '',
+    // false si el mail no trae Authentication-Results: no pudimos comprobar quién lo mandó.
+    autenticado: auth !== null,
     senales
   }
 }

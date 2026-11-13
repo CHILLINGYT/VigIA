@@ -138,7 +138,7 @@ function validarChat(datos) {
 	if (!Array.isArray(analisis) || analisis.length > MAXIMO_ANALISIS) return null;
 	const analisisOk = analisis.every(
 		(a) =>
-			(a?.tipo === 'link' || a?.tipo === 'archivo') &&
+			['link', 'archivo', 'mail'].includes(a?.tipo) &&
 			esTexto(a.objetivo, LARGO_MAXIMO_URL) &&
 			VEREDICTOS.includes(a.veredicto) &&
 			Array.isArray(a.motivos) &&

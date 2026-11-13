@@ -55,9 +55,10 @@ function curva(r, amplitud, k, fase, puntos = 160) {
 const anillo = (r, k) => [0, 1, 2].map((n) => curva(r, 2.4, k, (n * 2 * Math.PI) / 3)).join('')
 
 // Microtexto: la línea de letras diminutas de los billetes y el DNI, hecha con los nombres de las fuentes.
-const MICROTEXTO = 'VIGIA · GOOGLE SAFE BROWSING · URLHAUS · MALWAREBAZAAR · VIRUSTOTAL · REGLAS DE VIGIA · '.repeat(
-  6
-)
+const MICROTEXTO =
+  'VIGIA · GOOGLE SAFE BROWSING · URLHAUS · MALWAREBAZAAR · VIRUSTOTAL · REGLAS DE VIGIA · '.repeat(
+    6
+  )
 
 // Símbolo del centro: el veredicto también se entiende sin color.
 const SIMBOLOS = {
@@ -131,6 +132,7 @@ export function Sello({ resultado, emitido }) {
   }
   const info = VEREDICTOS[resultado.veredicto] ?? VEREDICTOS.desconocido
   const esArchivo = resultado.tipo === 'archivo'
+  const etiqueta = { archivo: 'ARCHIVO', mail: 'MAIL' }[resultado.tipo] ?? 'LINK'
 
   return (
     <article className={`sello ${resultado.veredicto} entra`}>
@@ -151,11 +153,19 @@ export function Sello({ resultado, emitido }) {
         </p>
         {/* El dato analizado como texto, nunca como link que se pueda abrir. */}
         <p className="sello-maquina">
-          <b>{esArchivo ? 'ARCHIVO' : 'LINK'}</b>
+          <b>{etiqueta}</b>
           <span>
             <Cortable texto={resultado.objetivo} />
           </span>
         </p>
+        {resultado.tipo === 'mail' && resultado.remitente && (
+          <p className="sello-maquina">
+            <b>DE</b>
+            <span>
+              <Cortable texto={resultado.remitente} />
+            </span>
+          </p>
+        )}
         {esArchivo && resultado.huella && (
           <p className="sello-maquina">
             <b>SHA-256</b>
