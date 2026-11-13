@@ -1,5 +1,6 @@
-// Análisis de un archivo por su "huella digital" (SHA-256).
-// Flujo: el usuario elige el archivo en el diálogo de Windows → SHA-256 → proxy → scoring.
+// Análisis de un archivo por su "huella digital" (SHA-256) y con Microsoft Defender.
+// Flujo: el usuario elige el archivo en el diálogo de Windows → SHA-256 → proxy,
+// y a la vez Defender lo escanea en la PC → scoring.
 // Seguridad (CLAUDE.md): el archivo SOLO se lee para calcular el hash. Nunca se abre,
 // nunca se ejecuta y nunca se sube: de la PC sale únicamente el hash.
 
@@ -9,6 +10,7 @@ import { basename } from 'path'
 import { calcularVeredicto, FUENTES_ARCHIVO } from '../core/scoring.js'
 import { consultarProxy } from './proxy.js'
 import { calcularSha256 } from './hash.js'
+import { escanearArchivo } from './defender.js'
 
 // Abre el diálogo nativo de Windows. Devuelve la ruta elegida o null si canceló.
 // La ruta la elige el usuario: la interfaz nunca manda una ruta.
@@ -32,26 +34,35 @@ export const resumirFuentes = (fuentes, esperadas) =>
 export async function analizarRuta(ruta) {
   // Mostramos solo el nombre, no la ruta completa (que puede incluir tu nombre de usuario).
   const nombre = basename(ruta)
-  let sha256
   try {
     if (!(await stat(ruta)).isFile())
       return { tipo: 'archivo', objetivo: nombre, error: 'Eso no es un archivo.' }
-    sha256 = await calcularSha256(ruta)
   } catch {
-    // Por ejemplo: el antivirus lo bloqueó o no tenemos permiso para leerlo.
     return { tipo: 'archivo', objetivo: nombre, error: 'No pudimos leer el archivo.' }
   }
 
-  const proxy = await consultarProxy('/check-hash', { sha256 })
-  const { veredicto, motivos } = calcularVeredicto(proxy.fuentes, [], FUENTES_ARCHIVO)
+  // La huella y el escaneo de Defender corren a la vez. Si no podemos leer el archivo
+  // (por ejemplo, el antivirus lo bloquea), igual nos queda lo que dijo Defender.
+  const [sha256, defender] = await Promise.all([
+    calcularSha256(ruta).catch(() => null),
+    escanearArchivo(ruta)
+  ])
+  const proxy = sha256
+    ? await consultarProxy('/check-hash', { sha256 })
+    : { problema: 'No pudimos leer el archivo para calcular su huella.' }
+
+  // defender es null si Defender está apagado o en modo pasivo: entonces no aparece como fuente.
+  const fuentes = [...(proxy.fuentes ?? []), ...(defender ? [defender] : [])]
+  const esperadas = defender ? [...FUENTES_ARCHIVO, 'defender'] : FUENTES_ARCHIVO
+  const { veredicto, motivos } = calcularVeredicto(fuentes, [], FUENTES_ARCHIVO)
 
   return {
     tipo: 'archivo',
     objetivo: nombre,
-    huella: sha256,
+    huella: sha256 ?? undefined,
     veredicto,
     motivos: proxy.problema ? [...motivos, proxy.problema] : motivos,
-    fuentes: resumirFuentes(proxy.fuentes, FUENTES_ARCHIVO),
+    fuentes: resumirFuentes(fuentes, esperadas),
     desdeCache: proxy.desde_cache === true
   }
 }

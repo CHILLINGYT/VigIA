@@ -6,7 +6,11 @@ import { execFile } from 'child_process'
 import { join } from 'path'
 import { interpretarEstadoDefender } from '../core/estadoDefender.js'
 import { interpretarHistorial } from '../core/historialDefender.js'
-import { concluirEscaneo, amenazasDesde } from '../core/escaneoDefender.js'
+import {
+  concluirEscaneo,
+  amenazasDesde,
+  interpretarEscaneoArchivo
+} from '../core/escaneoDefender.js'
 
 // Ruta completa: si escribiéramos solo "powershell.exe", Windows lo buscaría en el PATH
 // y otro programa podría hacerse pasar por PowerShell.
@@ -134,4 +138,34 @@ let estado = null
 export function estadoDefender() {
   estado ??= leerEstado().then(interpretarEstadoDefender)
   return estado
+}
+
+// Escanea UN archivo elegido por el usuario. -DisableRemediation: Defender solo mira, no lo
+// borra ni lo mueve (CLAUDE.md). La ruta va como un argumento más de la lista, nunca dentro de
+// un texto de consola. Devuelve la fuente 'defender', o null si Defender no puede escanear.
+function correrEscaneoArchivo(ruta) {
+  return new Promise((resolve) => {
+    execFile(
+      MPCMDRUN,
+      ['-Scan', '-ScanType', '3', '-File', ruta, '-DisableRemediation'],
+      { timeout: 5 * 60 * 1000, windowsHide: true },
+      (error, salida) => {
+        const codigo = !error
+          ? 0
+          : typeof error.code === 'number' && !error.killed
+            ? error.code
+            : null
+        resolve(interpretarEscaneoArchivo(codigo, salida))
+      }
+    )
+  })
+}
+
+// Cola: de a un archivo por vez, aunque se adjunten varios juntos (CLAUDE.md).
+let cola = Promise.resolve()
+export async function escanearArchivo(ruta) {
+  if (!(await estadoDefender()).puedeEscanear) return null
+  const turno = cola.then(() => correrEscaneoArchivo(ruta))
+  cola = turno.catch(() => {})
+  return turno
 }

@@ -1,6 +1,42 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { concluirEscaneo, amenazasDesde } from './escaneoDefender.js'
+import { concluirEscaneo, amenazasDesde, interpretarEscaneoArchivo } from './escaneoDefender.js'
+
+// Salidas reales de MpCmdRun en la PC de Gian (2026-11-13), recortadas.
+const SALIDA_EICAR = `Scan starting...
+Scan finished.
+Scanning C:\\prueba\\eicar2 found 1 threats.
+
+<===========================LIST OF DETECTED THREATS==========================>
+----------------------------- Threat information ------------------------------
+Threat                  : Virus:DOS/EICAR_Test_File
+Resources               : 1 total
+    file                : C:\\prueba\\eicar2\\eicar.com
+-------------------------------------------------------------------------------
+`
+const SALIDA_ERROR =
+  'CmdTool: Failed with hr = 0x80070002. Check C:\\Users\\x\\AppData\\Local\\Temp\\MpCmdRun.log for more information'
+
+test('archivo: EICAR detectado con su nombre (caso real)', () => {
+  assert.deepEqual(interpretarEscaneoArchivo(2, SALIDA_EICAR), {
+    fuente: 'defender',
+    resultado: 'detectado',
+    detalle: ['Virus:DOS/EICAR_Test_File']
+  })
+})
+
+test('archivo: código 2 sin amenazas listadas es un error (caso real)', () => {
+  assert.equal(interpretarEscaneoArchivo(2, SALIDA_ERROR).resultado, 'error')
+})
+
+test('archivo: código 0 es limpio; si no terminó, error', () => {
+  assert.equal(
+    interpretarEscaneoArchivo(0, 'Scan starting...\nScan finished.').resultado,
+    'no_detectado'
+  )
+  assert.equal(interpretarEscaneoArchivo(null, '').resultado, 'error')
+  assert.equal(interpretarEscaneoArchivo(2, undefined).resultado, 'error')
+})
 
 const amenaza = (estado) => ({ nombre: 'Virus:DOS/EICAR_Test_File', estado })
 

@@ -20,6 +20,11 @@ export const FUENTES = {
     tinta: 'var(--f-vt)',
     descripcion: 'Unos 90 antivirus a la vez.'
   },
+  defender: {
+    nombre: 'Microsoft Defender',
+    tinta: 'var(--f-defender)',
+    descripcion: 'El antivirus de Windows, en tu PC.'
+  },
   reglas_vigia: {
     nombre: 'Reglas de VigIA',
     tinta: 'var(--f-reglas)',

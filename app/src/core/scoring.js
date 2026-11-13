@@ -61,6 +61,14 @@ export function calcularVeredicto(fuentes, senales = [], esperadas = FUENTES_LIN
     else sospechosos.push(texto)
   }
 
+  const defender = fuente('defender')
+  if (defender?.resultado === 'detectado') {
+    const nombre = defender.detalle?.[0]
+    peligrosos.push(
+      `Microsoft Defender, el antivirus de tu PC, lo detecta como amenaza${nombre ? ` (${nombre})` : ''}.`
+    )
+  }
+
   for (const senal of senales) sospechosos.push(senal.detalle)
 
   if (peligrosos.length > 0)
@@ -71,7 +79,13 @@ export function calcularVeredicto(fuentes, senales = [], esperadas = FUENTES_LIN
   const respondieronTodas = esperadas.every(
     (nombre) => fuente(nombre)?.resultado === 'no_detectado'
   )
-  if (!respondieronTodas) {
+  // Un archivo propio (una foto, un documento) casi nunca está en las bases por huella: "sin_datos".
+  // Si además Defender lo escaneó y no encontró nada, ya podemos decir "no encontramos amenazas
+  // conocidas". Si alguna fuente dio error, no alcanza.
+  const defenderCubre =
+    defender?.resultado === 'no_detectado' &&
+    esperadas.every((nombre) => ['no_detectado', 'sin_datos'].includes(fuente(nombre)?.resultado))
+  if (!respondieronTodas && !defenderCubre) {
     return {
       veredicto: 'desconocido',
       motivos: ['No pudimos consultar todas las fuentes o no tienen datos sobre esto.']

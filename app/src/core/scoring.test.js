@@ -120,3 +120,32 @@ test('archivos: las fuentes esperadas son MalwareBazaar y VirusTotal', () => {
   const nuevo = [limpioArchivo[0], { fuente: 'virustotal', resultado: 'sin_datos' }]
   assert.equal(calcularVeredicto(nuevo, [], FUENTES_ARCHIVO).veredicto, 'desconocido')
 })
+
+test('archivos con Defender: si Defender lo detecta, peligroso aunque nadie más lo conozca', () => {
+  const r = calcularVeredicto(
+    [
+      { fuente: 'malwarebazaar', resultado: 'sin_datos' },
+      { fuente: 'virustotal', resultado: 'sin_datos' },
+      { fuente: 'defender', resultado: 'detectado', detalle: ['Virus:DOS/EICAR_Test_File'] }
+    ],
+    [],
+    FUENTES_ARCHIVO
+  )
+  assert.equal(r.veredicto, 'peligroso')
+  assert.match(r.motivos[0], /Microsoft Defender.*EICAR/)
+})
+
+test('archivos con Defender: un archivo propio que nadie conoce y Defender no marca', () => {
+  const propio = [
+    { fuente: 'malwarebazaar', resultado: 'sin_datos' },
+    { fuente: 'virustotal', resultado: 'sin_datos' },
+    { fuente: 'defender', resultado: 'no_detectado' }
+  ]
+  assert.equal(calcularVeredicto(propio, [], FUENTES_ARCHIVO).veredicto, 'sin_detecciones')
+  // Si una base de datos no respondió (error), Defender solo no alcanza.
+  const conError = [{ fuente: 'malwarebazaar', resultado: 'error' }, ...propio.slice(1)]
+  assert.equal(calcularVeredicto(conError, [], FUENTES_ARCHIVO).veredicto, 'desconocido')
+  // Y si Defender no pudo escanear, vuelve a ser desconocido como antes.
+  const sinDefender = [...propio.slice(0, 2), { fuente: 'defender', resultado: 'error' }]
+  assert.equal(calcularVeredicto(sinDefender, [], FUENTES_ARCHIVO).veredicto, 'desconocido')
+})

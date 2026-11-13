@@ -62,6 +62,24 @@ export function concluirEscaneo(codigo, nuevas, tipo = 'rapido') {
   }
 }
 
+// Escaneo de UN archivo (MpCmdRun -Scan -ScanType 3 -File <ruta> -DisableRemediation).
+// Con -DisableRemediation la detección NO queda en el historial (lo dice la ayuda de MpCmdRun),
+// así que leemos lo que MpCmdRun escribe. Salidas reales en la PC de Gian (2026-11-13):
+//   EICAR:            código 2, "found 1 threats" y "Threat : Virus:DOS/EICAR_Test_File"
+//   archivo inexistente: código 2, "CmdTool: Failed with hr = 0x80070002"
+// Devuelve una fuente con la misma forma que las del proxy: { fuente, resultado, detalle? }.
+export function interpretarEscaneoArchivo(codigo, salida) {
+  const texto = typeof salida === 'string' ? salida : ''
+  const cantidad = Number(/found (\d+) threats/i.exec(texto)?.[1] ?? 0)
+  if (cantidad > 0) {
+    const nombres = [...texto.matchAll(/^\s*Threat\s*:\s*(.+?)\s*$/gim)].map((m) => m[1])
+    return { fuente: 'defender', resultado: 'detectado', detalle: nombres }
+  }
+  // Solo "limpio" si terminó bien. Un 2 sin amenazas listadas es un error, no una detección.
+  if (codigo === 0) return { fuente: 'defender', resultado: 'no_detectado' }
+  return { fuente: 'defender', resultado: 'error' }
+}
+
 // Se queda con las amenazas detectadas desde "inicio" (milisegundos).
 // Margen de 5 segundos por si el reloj de Defender y el de la app no coinciden exacto.
 export function amenazasDesde(amenazas, inicio) {
