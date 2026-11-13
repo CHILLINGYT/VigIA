@@ -188,6 +188,16 @@ function App() {
         actualizar(idRespuesta, { estado: 'listo', error: paso1.error })
         return
       }
+      if (paso1.escanear) {
+        actualizar(idRespuesta, {
+          estado: 'listo',
+          texto: escaneando
+            ? 'Ya hay un escaneo de Microsoft Defender en curso. Te muestro el resultado cuando termine.'
+            : 'Para eso uso Microsoft Defender: arranco un escaneo rápido. Si querés revisar todos los archivos, tocá "Escanear todo" en el costado (puede tardar horas).'
+        })
+        escanearPc('rapido')
+        return
+      }
       const hora = new Date().toLocaleTimeString('es-AR', {
         hour: '2-digit',
         minute: '2-digit',

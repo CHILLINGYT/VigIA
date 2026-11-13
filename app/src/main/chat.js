@@ -6,6 +6,7 @@
 // vienen del paso 1, no de la respuesta de la IA.
 
 import { extraerUrls } from '../core/extraerUrls.js'
+import { esPedidoDeEscaneo } from '../core/pedidoEscaneo.js'
 import { analizarUrl } from './analizarUrl.js'
 import { analizarRuta, elegirArchivo } from './analizarArchivo.js'
 import { consultarProxy } from './proxy.js'
@@ -40,6 +41,10 @@ export async function analizarMensaje(texto, ids) {
   // Solo aceptamos ids que este proceso entregó: la interfaz no puede inventar archivos.
   const elegidos = ids.map((id) => adjuntos.get(id)).filter(Boolean)
   ids.forEach((id) => adjuntos.delete(id))
+
+  // "Analizá mi PC": eso no lo puede hacer la IA. Le avisamos a la interfaz que arranque
+  // el escaneo de Defender (la misma función que el botón del costado).
+  if (elegidos.length === 0 && esPedidoDeEscaneo(texto)) return { escanear: true }
 
   const links = extraerUrls(texto).slice(0, MAXIMO_LINKS)
   const resultados = await Promise.all([

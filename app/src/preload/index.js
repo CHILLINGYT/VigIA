@@ -8,7 +8,8 @@ const api = {
   adjuntarArchivo: () => ipcRenderer.invoke('adjuntar-archivo'),
   quitarAdjunto: (id) => ipcRenderer.invoke('quitar-adjunto', id),
 
-  // Paso 1 del chat: analiza los links del mensaje y los adjuntos (sin IA). Devuelve { id, analisis }.
+  // Paso 1 del chat: analiza los links del mensaje y los adjuntos (sin IA). Devuelve { id, analisis },
+  // o { escanear: true } si el mensaje pide revisar la PC.
   analizarMensaje: (texto, idsAdjuntos) =>
     ipcRenderer.invoke('analizar-mensaje', texto, idsAdjuntos),
   // Paso 2 del chat: la IA explica los veredictos del paso 1. Devuelve { respuesta } o { error }.
