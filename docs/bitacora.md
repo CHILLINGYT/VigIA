@@ -67,3 +67,24 @@ Registro de cada sesión de trabajo: qué hicimos, qué decidimos, qué falló y
   - Las pruebas automáticas sobre la PC de una persona pueden tocar sus cosas: hay que hacerlas en lugares aislados o a mano.
   - Probar en vez de suponer (Defender, la caché, el formato de Safe Browsing).
 - **Próximo paso:** escanear archivos con Defender (`MpCmdRun`) y comprobar sus códigos de salida con el archivo de prueba EICAR. También subir el repositorio a GitHub como copia de respaldo y que el equipo de investigación verifique la lista de dominios oficiales de las marcas.
+
+### 2026-11-12: instalamos VigIA en otra PC y cambiamos la contraseña del proxy
+
+- **Qué hicimos:**
+  - Bajamos el proyecto desde GitHub a una segunda computadora, instalamos lo necesario para correrlo (Node.js y Git) y abrimos la app.
+  - Generamos una contraseña nueva para que la app pueda usar el proxy (el "token") y la cargamos en dos lugares: en el archivo `app/.env` de esta PC y en Cloudflare como secreto `APP_TOKEN`.
+  - Comprobamos que todo anda: el link de prueba de Google sale "peligroso" (lo detectan Google Safe Browsing y 9 antivirus de VirusTotal) y el chat con la IA responde.
+- **Decisiones y por qué:**
+  - **Hicimos una contraseña nueva en vez de recuperar la vieja.** Cloudflare no deja volver a ver un secreto una vez guardado (solo reemplazarlo), y la vieja estaba solo en la otra PC.
+  - **La contraseña nueva se generó al azar con una función criptográfica** (`RandomNumberGenerator`), no con un "número al azar" común que se puede adivinar. Tiene 64 caracteres.
+  - **La contraseña nunca apareció en pantalla ni en el chat con la IA.** Se escribió directo en los archivos y el archivo temporal que se usó para subirla a Cloudflare se borró enseguida.
+- **Problemas y cómo se resolvieron:**
+  - **La app abría, pero el chat no respondía y los links solo se revisaban con nuestras reglas.** Al probar el proxy directamente, respondía "no autorizado": a la app le faltaba la contraseña. El archivo `.env` donde se guarda no se sube a GitHub a propósito (está en `.gitignore`), así que no vino con el proyecto.
+  - **Al principio parecía que el escaneo de links funcionaba**, porque detectaba `mercadopag0.com`. Pero eso lo hacen nuestras reglas, que corren en la PC. Las fuentes externas (Google, URLhaus, VirusTotal) estaban fallando, y la tarjeta lo avisaba con "El servicio de VigIA no respondió bien".
+  - **La descarga de Electron se cortó a mitad de camino** la primera vez. Se resolvió reintentando.
+  - **La terminal no reconocía `npm`.** Primero porque estaba abierta desde antes de instalar Node.js (hubo que abrir una nueva). Después porque Windows bloquea los scripts de PowerShell: se resolvió usando `npm.cmd` en lugar de `npm`, sin cambiar la configuración de seguridad de Windows.
+- **Qué aprendimos:**
+  - Los secretos (contraseñas, claves) no viajan con el código, y eso está bien: si alguien baja el proyecto de GitHub, no puede usar nuestro proxy. Pero hay que saber dónde están para poder instalar el proyecto en otra PC.
+  - Que una parte funcione no significa que funcione todo: hay que mirar qué fuente dio cada resultado.
+  - Probar el proxy por separado de la app ayuda a encontrar dónde está el problema.
+- **Próximo paso:** copiar la contraseña nueva al `app/.env` de la otra PC (la vieja ya no sirve). Seguir con lo pendiente de la sesión anterior: el escaneo de archivos con Defender.
