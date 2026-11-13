@@ -23,7 +23,9 @@ it('una instalación pasada de su límite no gasta el límite global', async () 
 	expect(cantidad).toBe(50 + 1 + 50); // test anterior (50 + 1 de otra instalación) + este
 });
 
-it('el total global se corta en 400 aunque se usen IDs nuevos', async () => {
+// 300 consultas tardan unos 4,5 s, casi el límite de 5 s de vitest: a veces fallaba por tiempo
+// (2026-11-13). Le damos 30 s.
+it('el total global se corta en 400 aunque se usen IDs nuevos', { timeout: 30_000 }, async () => {
 	// Ya hay 101 consultas globales de los tests anteriores: faltan 299 para llegar a 400.
 	for (let i = 0; i < 299; i++) await pedir(crypto.randomUUID());
 	expect((await pedir(crypto.randomUUID())).status).toBe(429);
